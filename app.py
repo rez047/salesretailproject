@@ -110,6 +110,24 @@ def buyer():
     return render_template("buyer_dashboard.html")
 
 
+@retailer_bp.route("/retailer/order/<int:order_id>/status", methods=["POST"])
+@login_required
+def update_status(order_id):
+
+    order = Order.query.get(order_id)
+
+    if not order:
+        return "Order not found", 404
+
+    new_status = request.form.get("status")
+
+    order.status = new_status
+
+    db.session.commit()
+
+    return redirect("/retailer/dashboard")
+    
+
 # =========================
 # DATABASE INIT (CLEAN)
 # =========================
