@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout - Imani Retailshop</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>Checkout</h1>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Confirm Order</h2>
+
+    <p>Review your cart before placing order.</p>
+
+    <button onclick="checkout()">Place Order</button>
+
+  </div>
+
+</div>
+
+<script>
+function checkout() {
+  fetch("/cart")
+  .then(res => res.json())
+  .then(cart => {
+
+    cart.forEach(item => {
+      fetch("/order", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          product_id: item.product_id,
+          quantity: item.quantity
+        })
+      });
+    });
+
+    alert("Order placed successfully!");
+    fetch("/cart/clear", {method: "POST"});
+  });
+}
+</script>
+
+</body>
+</html>

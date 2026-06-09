@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Retailer Dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>Retailer Panel</h1>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>Add Product</h2>
+
+    <input id="name" placeholder="Product Name">
+    <input id="price" placeholder="Price">
+    <input id="stock" placeholder="Stock">
+
+    <button onclick="addProduct()">Add</button>
+  </div>
+</div>
+
+<script>
+function addProduct() {
+  fetch("/product/add", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      price: document.getElementById("price").value,
+      stock: document.getElementById("stock").value
+    })
+  }).then(res => res.json()).then(alert);
+}
+</script>
+
+</body>
+</html>

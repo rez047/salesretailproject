@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register - Imani Retailshop</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<header>
+  <h1>Create Account</h1>
+</header>
+
+<div class="container">
+
+  <form method="POST" action="/register" class="card">
+
+    <h2>Register</h2>
+
+    <input type="text" name="username" placeholder="Username" required><br><br>
+
+    <input type="email" name="email" placeholder="Email" required><br><br>
+
+    <input type="password" name="password" placeholder="Password" required><br><br>
+
+    <select name="role" required>
+      <option value="buyer">Buyer</option>
+      <option value="retailer">Retailer</option>
+    </select>
+
+    <br><br>
+
+    <button type="submit">Register</button>
+
+    <p>Already have an account? <a href="/login">Login</a></p>
+
+  </form>
+
+</div>
+
+</body>
+</html>
