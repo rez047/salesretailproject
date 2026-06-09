@@ -1,40 +1,123 @@
-from flask import Blueprint, session, request, jsonify
-from utils import allowed_file
+from flask import Blueprint, redirect, url_for
+from flask_login import login_required, current_user
+from models import db, Product, CartItem, Order
 
 cart = Blueprint("cart", __name__)
 
-# --------------------
-# ADD TO CART (SESSION BASED)
-# --------------------
-@cart.route("/cart/add", methods=["POST"])
-def add_to_cart():
-    data = request.json
 
-    if "cart" not in session:
-        session["cart"] = []
+# =========================
+# ADD TO CART (DB-BASED)
+# =========================
+@cart.route("/cart/add/<int:product_id>")
+@login_required
+def add_to_cart(product_id):
 
-    session["cart"].append({
-        "product_id": data["product_id"],
-        "quantity": data["quantity"]
-    })
+    item = CartItem.query.filter_by(
+        user_id=current_user.id,
+        product_id=product_id
+    ).first()
 
-    session.modified = True
+    if item:
+        item.quantity += 1
+    else:
+        item = CartItem(
+            user_id=current_user.id,
+            product_id=product_id,
+            quantity=1
+        )
+        db.session.add(item)
 
-    return jsonify({"message": "Added to cart"})
+    db.session.commit()
+
+    return redirect(url_for("cart.view_cart"))
 
 
-# --------------------
+# =========================
 # VIEW CART
-# --------------------
-@cart.route("/cart", methods=["GET"])
+# =========================
+@cart.route("/cart")
+@login_required
 def view_cart():
-    return jsonify(session.get("cart", []))
+
+    items = CartItem.query.filter_by(user_id=current_user.id).all()
+
+    cart_data = []
+
+    total = 0
+
+    for item in items:
+        product = Product.query.get(item.product_id)
+
+        subtotal = product.price * item.quantity
+        total += subtotal
+
+        cart_data.append({
+            "product_id": product.id,
+            "name": product.name,
+            "price": product.price,
+            "quantity": item.quantity,
+            "subtotal": subtotal
+        })
+
+    return {
+        "items": cart_data,
+        "total": total
+    }
 
 
-# --------------------
-# CLEAR CART
-# --------------------
-@cart.route("/cart/clear", methods=["POST"])
-def clear_cart():
-    session["cart"] = []
-    return jsonify({"message": "Cart cleared"})
+# =========================
+# REMOVE ITEM FROM CART
+# =========================
+@cart.route("/cart/remove/<int:product_id>")
+@login_required
+def remove_from_cart(product_id):
+
+    item = CartItem.query.filter_by(
+        user_id=current_user.id,
+        product_id=product_id
+    ).first()
+
+    if item:
+        db.session.delete(item)
+        db.session.commit()
+
+    return redirect(url_for("cart.view_cart"))
+
+
+# =========================
+# CHECKOUT
+# =========================
+@cart.route("/checkout")
+@login_required
+def checkout():
+
+    items = CartItem.query.filter_by(user_id=current_user.id).all()
+
+    if not items:
+        return {"message": "Cart is empty"}
+
+    total = 0
+
+    for item in items:
+        product = Product.query.get(item.product_id)
+        total += product.price * item.quantity
+
+    # create order
+    order = Order(
+        user_id=current_user.id,
+        total_amount=total,
+        status="Placed"
+    )
+
+    db.session.add(order)
+
+    # clear cart after checkout
+    for item in items:
+        db.session.delete(item)
+
+    db.session.commit()
+
+    return {
+        "message": "Order placed successfully",
+        "total": total
+    }
