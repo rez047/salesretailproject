@@ -1,21 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Panel</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            margin: 0;
+        }
+        header {
+            background: #004080;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px auto;
+            width: 60%;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-
 <body>
 
 <header>
-  <h1>Admin Dashboard</h1>
+    <h1>Admin Dashboard</h1>
 </header>
 
 <div class="container">
-  <div class="card">
-    <h2>System Control Panel</h2>
-    <p>Manage users, retailers, and products.</p>
-  </div>
+
+    <div class="card">
+        <h2>System Control Panel</h2>
+        <p>Manage users, retailers, and products.</p>
+    </div>
+
+    <div class="card">
+        <h3>User Management</h3>
+        <p>Add / Remove / Edit users</p>
+    </div>
+
+    <div class="card">
+        <h3>Retailer Management</h3>
+        <p>Approve and manage retailers</p>
+    </div>
+
 </div>
 
 </body>
