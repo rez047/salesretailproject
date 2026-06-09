@@ -13,6 +13,7 @@ from reviews import reviews
 
 from security import role_required
 
+from retailer import retailer_bp
 
 # =========================
 # APP INIT
@@ -43,7 +44,7 @@ app.register_blueprint(cart)
 app.register_blueprint(market)
 app.register_blueprint(chat)
 app.register_blueprint(reviews)
-
+app.register_blueprint(retailer_bp)
 
 # =========================
 # USER LOADER
