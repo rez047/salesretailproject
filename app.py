@@ -4,12 +4,13 @@ from chat import chat
 from reviews import reviews
 from config import Config
 from extensions import db, login_manager
-from models import User
+from models import User, Product, Order
 from auth import auth
 from utils import allowed_file
 from security import role_required
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from auth import create_admin
+from admin import admin_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -18,6 +19,7 @@ db.init_app(app)
 login_manager.init_app(app)
 
 app.register_blueprint(auth)
+app.register_blueprint(admin_bp)
 
 @login_manager.user_loader
 def load_user(user_id):
