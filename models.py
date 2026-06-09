@@ -6,10 +6,16 @@ from utils import allowed_file
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+
+    username = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+
     password_hash = db.Column(db.String(200), nullable=False)
+
     role = db.Column(db.String(20), nullable=False)  # admin, retailer, buyer
+
+    is_verified = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=False)  # admin, retailer, buyer
 
     def set_password(self, password):
         if len(password) < 8:
