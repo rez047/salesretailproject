@@ -1,5 +1,5 @@
 import os
-from resend import Resend
+import resend
 
 # =========================
 # FILE UPLOAD HELPERS (optional)
@@ -21,21 +21,18 @@ def allowed_file(filename):
 resend.api_key = os.getenv("RESEND_API_KEY")
 
 
-def send_verification_email(to_email, token):
-    """
-    Sends verification email using Resend API.
-    """
+def send_verification_email(email, token):
 
-    verify_url = f"https://emiratessales888.onrender.com/verify/{token}"
+    verify_url = f"https://emirates-6l9y.onrender.com/verify/{token}"
 
-    response = resend_client.emails.send({
-        "from": "Emirates Shop <onboarding@resend.dev>",
-        "to": [to_email],
-        "subject": "Verify your account",
+    resend.Emails.send({
+        "from": "onboarding@resend.dev",
+        "to": email,
+        "subject": "Verify your email",
         "html": f"""
-            <h2>Verify Your Account</h2>
-            <p>Click the link below to verify your email:</p>
-            <a href="{verify_url}">{verify_url}</a>
+        <h2>Verify your account</h2>
+        <p>Click below to verify:</p>
+        <a href="{verify_url}">Verify Email</a>
         """
     })
 
