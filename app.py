@@ -126,7 +126,30 @@ def update_status(order_id):
     db.session.commit()
 
     return redirect("/retailer/dashboard")
-    
+
+@cart.route("/cart/add/<int:product_id>")
+@login_required
+def add_to_cart(product_id):
+
+    item = CartItem.query.filter_by(
+        user_id=current_user.id,
+        product_id=product_id
+    ).first()
+
+    if item:
+        item.quantity += 1
+    else:
+        item = CartItem(
+            user_id=current_user.id,
+            product_id=product_id,
+            quantity=1
+        )
+        db.session.add(item)
+
+    db.session.commit()
+
+    return redirect("/cart")
+
 
 # =========================
 # DATABASE INIT (CLEAN)
