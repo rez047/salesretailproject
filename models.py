@@ -34,14 +34,6 @@ class Product(db.Model):
     retailer_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 
-class Order(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    buyer_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    product_id = db.Column(db.Integer, db.ForeignKey("product.id"))
-    quantity = db.Column(db.Integer)
-    status = db.Column(db.String(50), default="pending")
-
-
 class Chat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey("user.id"))
