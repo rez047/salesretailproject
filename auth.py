@@ -84,8 +84,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        print("EMAIL VERIFICATION LINK")
-        print(f"/verify/{token}")
+        send_verification_email(user.email, user.verification_token)
 
         return redirect(url_for("auth.login"))
 
@@ -95,22 +94,23 @@ def register():
 # ===================================
 # VERIFY EMAIL
 # ===================================
-@auth.route("/verify/<token>")
-def verify(token):
 
-    user = User.query.filter_by(
-        verification_token=token
-    ).first()
+@auth.route("/verify/<token>")
+def verify_email(token):
+
+    user = User.query.filter_by(verification_token=token).first()
 
     if not user:
-        return "Invalid token"
+        return "Invalid or expired verification link", 400
 
     user.is_verified = True
+    user.is_active = True
     user.verification_token = None
 
     db.session.commit()
 
-    return "Email verified successfully."
+    return "Email verified successfully. You can now log in."
+    
 
 
 # ===================================
