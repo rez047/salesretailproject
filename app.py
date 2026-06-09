@@ -84,6 +84,13 @@ app.config.update(
     SESSION_COOKIE_SECURE=True  # set TRUE in production HTTPS
 )
 
+def init_db():
+    with app.app_context():
+        db.create_all()
+        create_admin()
+
+init_db()
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
