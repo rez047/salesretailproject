@@ -1,5 +1,4 @@
 from flask import Flask, render_template
-from flask_login import login_required
 
 from config import Config
 
@@ -17,12 +16,8 @@ from retailer import retailer_bp
 
 from security import role_required
 
-
-# ==================================
-# APP CREATION
-# ==================================
-
 app = Flask(__name__)
+
 app.config.from_object(Config)
 
 app.config.update(
@@ -31,29 +26,16 @@ app.config.update(
     SESSION_COOKIE_SECURE=False
 )
 
-
-# ==================================
-# EXTENSIONS
-# ==================================
-
 db.init_app(app)
 login_manager.init_app(app)
 
 login_manager.login_view = "auth.login"
 
 
-# ==================================
-# USER LOADER
-# ==================================
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
-# ==================================
-# REGISTER BLUEPRINTS
-# ==================================
 
 app.register_blueprint(auth)
 app.register_blueprint(admin_bp)
@@ -63,10 +45,6 @@ app.register_blueprint(chat)
 app.register_blueprint(reviews)
 app.register_blueprint(retailer_bp)
 
-
-# ==================================
-# PUBLIC PAGES
-# ==================================
 
 @app.route("/")
 def home():
@@ -93,19 +71,7 @@ def checkout_page():
     return render_template("checkout.html")
 
 
-# ==================================
-# DASHBOARDS
-# ==================================
-
-@app.route("/admin")
-@login_required
-@role_required("admin")
-def admin_dashboard():
-    return render_template("admin_dashboard.html")
-
-
 @app.route("/buyer")
-@login_required
 def buyer_dashboard():
 
     products = Product.query.all()
@@ -116,9 +82,11 @@ def buyer_dashboard():
     )
 
 
-# ==================================
-# DATABASE INITIALIZATION
-# ==================================
+@app.route("/admin")
+@role_required("admin")
+def admin_dashboard():
+    return render_template("admin_dashboard.html")
+
 
 def init_db():
 
@@ -131,10 +99,6 @@ def init_db():
 
 init_db()
 
-
-# ==================================
-# START SERVER
-# ==================================
 
 if __name__ == "__main__":
 
