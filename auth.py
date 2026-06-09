@@ -144,7 +144,6 @@ def create_admin():
         email=admin_email,
         role="admin",
         is_verified=True,
-        is_active=True
     )
 
     admin.set_password(admin_password)
