@@ -44,6 +44,7 @@ class User(UserMixin, db.Model):
 
     verification_token = db.Column(
         db.String(255),
+        unique=True,
         nullable=True
     )
 
