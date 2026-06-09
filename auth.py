@@ -7,6 +7,7 @@ from flask_login import login_user, logout_user
 from dotenv import load_dotenv
 
 from models import db, User
+from utils import send_verification_email
 
 load_dotenv()
 
