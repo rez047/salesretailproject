@@ -11,7 +11,10 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(150), nullable=False)
+    username = db.Column(
+        db.String(150),
+        nullable=False
+    )
 
     email = db.Column(
         db.String(150),
@@ -39,7 +42,11 @@ class User(UserMixin, db.Model):
         default=False
     )
 
-    # Relationships
+    verification_token = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
     products = db.relationship(
         "Product",
         backref="retailer",
@@ -64,28 +71,15 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(
-        db.String(200),
-        nullable=False
-    )
+    name = db.Column(db.String(200), nullable=False)
 
-    description = db.Column(
-        db.Text
-    )
+    description = db.Column(db.Text)
 
-    price = db.Column(
-        db.Float,
-        nullable=False
-    )
+    price = db.Column(db.Float, nullable=False)
 
-    stock = db.Column(
-        db.Integer,
-        default=0
-    )
+    stock = db.Column(db.Integer, default=0)
 
-    image = db.Column(
-        db.String(255)
-    )
+    image = db.Column(db.String(255))
 
     retailer_id = db.Column(
         db.Integer,
@@ -94,7 +88,7 @@ class Product(db.Model):
 
 
 # ===================================
-# CART ITEMS
+# CART
 # ===================================
 class CartItem(db.Model):
     __tablename__ = "cart_item"
@@ -178,17 +172,13 @@ class Review(db.Model):
         db.ForeignKey("product.id")
     )
 
-    rating = db.Column(
-        db.Integer
-    )
+    rating = db.Column(db.Integer)
 
-    comment = db.Column(
-        db.Text
-    )
+    comment = db.Column(db.Text)
 
 
 # ===================================
-# LIVE CHAT
+# CHAT
 # ===================================
 class Chat(db.Model):
     __tablename__ = "chat"
