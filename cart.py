@@ -1,13 +1,20 @@
-from flask import Blueprint, redirect, url_for, request, render_template
+from flask import Blueprint, redirect, url_for, render_template
 from flask_login import login_required, current_user
-from models import db, Product, CartItem, Order
+
+from models import (
+    db,
+    Product,
+    CartItem,
+    Order
+)
 
 cart = Blueprint("cart", __name__)
 
 
-# =========================
-# ADD TO CART (DB-BASED)
-# =========================
+# =====================================
+# ADD TO CART
+# =====================================
+
 @cart.route("/cart/add/<int:product_id>")
 @login_required
 def add_to_cart(product_id):
@@ -18,65 +25,57 @@ def add_to_cart(product_id):
     ).first()
 
     if item:
+
         item.quantity += 1
+
     else:
+
         item = CartItem(
             user_id=current_user.id,
             product_id=product_id,
             quantity=1
         )
+
         db.session.add(item)
 
     db.session.commit()
 
-    return redirect(url_for("cart.view_cart"))
+    return redirect(
+        url_for("cart.view_cart")
+    )
 
-@cart.route("/checkout", methods=["POST"])
-@login_required
-def checkout():
 
-    cart_items = session.get("cart", [])
-
-    for item in cart_items:
-
-        product = Product.query.get(item["product_id"])
-
-        order = Order(
-            user_id=current_user.id,
-            product_id=product.id,
-            quantity=item["quantity"],
-            total_price=product.price * item["quantity"],
-            status="pending"
-        )
-
-        db.session.add(order)
-
-    db.session.commit()
-
-    session["cart"] = []
-
-    return "Order placed successfully"
-    
-# =========================
+# =====================================
 # VIEW CART
-# =========================
+# =====================================
+
 @cart.route("/cart")
 @login_required
 def view_cart():
 
-    items = CartItem.query.filter_by(user_id=current_user.id).all()
+    items = CartItem.query.filter_by(
+        user_id=current_user.id
+    ).all()
 
-    cart_data = []
+    cart_items = []
 
     total = 0
 
     for item in items:
-        product = Product.query.get(item.product_id)
+
+        product = Product.query.get(
+            item.product_id
+        )
+
+        if not product:
+            continue
 
         subtotal = product.price * item.quantity
+
         total += subtotal
 
-        cart_data.append({
+        cart_items.append({
+            "id": item.id,
             "product_id": product.id,
             "name": product.name,
             "price": product.price,
@@ -84,27 +83,74 @@ def view_cart():
             "subtotal": subtotal
         })
 
-    return {
-        "items": cart_data,
-        "total": total
-    }
+    return render_template(
+        "cart.html",
+        items=cart_items,
+        total=total
+    )
 
 
-# =========================
-# REMOVE ITEM FROM CART
-# =========================
-@cart.route("/cart/remove/<int:product_id>")
+# =====================================
+# REMOVE ITEM
+# =====================================
+
+@cart.route("/cart/remove/<int:item_id>")
 @login_required
-def remove_from_cart(product_id):
+def remove_item(item_id):
 
-    item = CartItem.query.filter_by(
-        user_id=current_user.id,
-        product_id=product_id
-    ).first()
+    item = CartItem.query.get(item_id)
 
-    if item:
+    if item and item.user_id == current_user.id:
+
         db.session.delete(item)
+
         db.session.commit()
 
-    return redirect(url_for("cart.view_cart"))
+    return redirect(
+        url_for("cart.view_cart")
+    )
 
+
+# =====================================
+# CHECKOUT
+# =====================================
+
+@cart.route("/checkout", methods=["POST"])
+@login_required
+def checkout():
+
+    cart_items = CartItem.query.filter_by(
+        user_id=current_user.id
+    ).all()
+
+    if not cart_items:
+
+        return "Cart is empty", 400
+
+    for item in cart_items:
+
+        product = Product.query.get(
+            item.product_id
+        )
+
+        if not product:
+            continue
+
+        order = Order(
+            user_id=current_user.id,
+            product_id=product.id,
+            quantity=item.quantity,
+            total_price=product.price * item.quantity,
+            status="pending",
+            retailer_id=product.retailer_id
+        )
+
+        db.session.add(order)
+
+        db.session.delete(item)
+
+    db.session.commit()
+
+    return redirect(
+        url_for("buyer_dashboard")
+    )
