@@ -69,7 +69,13 @@ class CartItem(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer)
-    total_amount = db.Column(db.Float)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
 
-    status = db.Column(db.String(50), default="Pending")
+    quantity = db.Column(db.Integer, nullable=False)
+    total_price = db.Column(db.Float, nullable=False)
+
+    status = db.Column(db.String(20), default="pending")
+    # pending | processing | shipped | delivered
+
+    retailer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
