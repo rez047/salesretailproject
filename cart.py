@@ -31,7 +31,32 @@ def add_to_cart(product_id):
 
     return redirect(url_for("cart.view_cart"))
 
+@cart.route("/checkout", methods=["POST"])
+@login_required
+def checkout():
 
+    cart_items = session.get("cart", [])
+
+    for item in cart_items:
+
+        product = Product.query.get(item["product_id"])
+
+        order = Order(
+            user_id=current_user.id,
+            product_id=product.id,
+            quantity=item["quantity"],
+            total_price=product.price * item["quantity"],
+            status="pending"
+        )
+
+        db.session.add(order)
+
+    db.session.commit()
+
+    session["cart"] = []
+
+    return "Order placed successfully"
+    
 # =========================
 # VIEW CART
 # =========================
