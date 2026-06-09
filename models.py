@@ -42,6 +42,11 @@ class User(UserMixin, db.Model):
         default=False
     )
 
+    is_active=db.Column(
+        db.Boolean,
+        default=False
+    )
+
     verification_token = db.Column(
         db.String(255),
         unique=True,
