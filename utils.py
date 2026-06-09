@@ -20,7 +20,7 @@ def allowed_file(filename):
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
-resend_client = Resend(1bf17029-9584-47ab-aca2-699ceae0e1e2)
+resend_client = Resend(re_FP6gmyFo_MpUW1tf4KwffLFDCrPLnfQva)
 
 
 def send_verification_email(to_email, token):
