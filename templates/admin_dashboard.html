@@ -2,54 +2,167 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>Admin Control Panel</title>
+
     <style>
         body {
-            font-family: Arial;
-            background: #f4f4f4;
+            font-family: Arial, sans-serif;
             margin: 0;
+            background: #f4f6f9;
         }
+
         header {
-            background: #004080;
+            background: #0b3d91;
             color: white;
-            padding: 15px;
+            padding: 18px;
             text-align: center;
+            font-size: 22px;
         }
+
         .container {
             padding: 20px;
-            text-align: center;
         }
+
         .card {
             background: white;
             padding: 20px;
-            margin: 10px auto;
-            width: 60%;
+            margin-bottom: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        table th {
+            background: #0b3d91;
+            color: white;
+        }
+
+        button, a.button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            margin: 2px;
+        }
+
+        .delete { background: red; }
+        .approve { background: green; }
+        .add { background: orange; }
     </style>
 </head>
+
 <body>
 
 <header>
-    <h1>Admin Dashboard</h1>
+    Admin Control Panel - Emirates Retailshop
 </header>
 
 <div class="container">
 
+    <!-- ================= USERS ================= -->
     <div class="card">
-        <h2>System Control Panel</h2>
-        <p>Manage users, retailers, and products.</p>
+        <h2>User Management</h2>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Approved</th>
+                <th>Actions</th>
+            </tr>
+
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.approved }}</td>
+                <td>
+                    <a class="button delete" href="/delete_user/{{ user.id }}">Delete</a>
+
+                    {% if user.role == "retailer" and not user.approved %}
+                        <a class="button approve" href="/approve_retailer/{{ user.id }}">Approve</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
+    <!-- ================= PRODUCTS ================= -->
     <div class="card">
-        <h3>User Management</h3>
-        <p>Add / Remove / Edit users</p>
+        <h2>Product Management</h2>
+
+        <form method="POST" action="/add_product">
+            <input type="text" name="name" placeholder="Product Name" required>
+            <input type="number" name="price" placeholder="Price" required>
+            <input type="number" name="stock" placeholder="Stock" required>
+            <button class="add" type="submit">Add Product</button>
+        </form>
+
+        <br>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Action</th>
+            </tr>
+
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.stock }}</td>
+                <td>
+                    <a class="button delete" href="/delete_product/{{ product.id }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
+    <!-- ================= ORDERS ================= -->
     <div class="card">
-        <h3>Retailer Management</h3>
-        <p>Approve and manage retailers</p>
+        <h2>Order Management</h2>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Buyer ID</th>
+                <th>Product ID</th>
+                <th>Quantity</th>
+                <th>Status</th>
+            </tr>
+
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.buyer_id }}</td>
+                <td>{{ order.product_id }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>{{ order.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 
 </div>
