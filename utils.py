@@ -2,10 +2,9 @@ import os
 import resend
 
 # =========================
-# FILE UPLOAD HELPERS (optional)
+# FILE UPLOAD HELPERS
 # =========================
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-
 
 def allowed_file(filename):
     return (
@@ -15,17 +14,19 @@ def allowed_file(filename):
 
 
 # =========================
-# EMAIL (RESEND SERVICE)
+# RESEND CONFIG
 # =========================
-
 resend.api_key = os.getenv("RESEND_API_KEY")
 
 
+# =========================
+# EMAIL FUNCTION
+# =========================
 def send_verification_email(email, token):
 
     verify_url = f"https://emirates-6l9y.onrender.com/verify/{token}"
 
-    resend.Emails.send({
+    response = resend.Emails.send({
         "from": "onboarding@resend.dev",
         "to": email,
         "subject": "Verify your email",
