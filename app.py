@@ -106,8 +106,10 @@ def dashboard():
 
 
 @app.route("/buyer")
+@login_required
 def buyer():
-    return render_template("buyer_dashboard.html")
+    products = Product.query.all()
+    return render_template("buyer_dashboard.html", products=products)
 
 
 @retailer_bp.route("/retailer/order/<int:order_id>/status", methods=["POST"])
