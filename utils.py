@@ -18,9 +18,7 @@ def allowed_file(filename):
 # EMAIL (RESEND SERVICE)
 # =========================
 
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-
-resend_client = Resend(re_FP6gmyFo_MpUW1tf4KwffLFDCrPLnfQva)
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 
 def send_verification_email(to_email, token):
