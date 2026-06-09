@@ -11,10 +11,7 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(
-        db.String(150),
-        nullable=False
-    )
+    username = db.Column(db.String(150), nullable=False)
 
     email = db.Column(
         db.String(150),
@@ -42,31 +39,39 @@ class User(UserMixin, db.Model):
         default=False
     )
 
-    is_active=db.Column(
+    is_active = db.Column(
         db.Boolean,
         default=False
     )
 
+    # IMPORTANT: email verification token
     verification_token = db.Column(
         db.String(255),
         unique=True,
         nullable=True
     )
 
+    # Relationships
     products = db.relationship(
         "Product",
         backref="retailer",
         lazy=True
     )
 
+    orders = db.relationship(
+        "Order",
+        foreign_keys="Order.user_id",
+        backref="buyer",
+        lazy=True
+    )
+
     def set_password(self, password):
+        if len(password) < 8:
+            raise ValueError("Password too weak (min 8 chars)")
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(
-            self.password_hash,
-            password
-        )
+        return check_password_hash(self.password_hash, password)
 
 
 # ===================================
@@ -89,12 +94,15 @@ class Product(db.Model):
 
     retailer_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id")
+        db.ForeignKey("user.id"),
+        nullable=False
     )
+
+    orders = db.relationship("Order", backref="product", lazy=True)
 
 
 # ===================================
-# CART
+# CART ITEM (DATABASE BASED)
 # ===================================
 class CartItem(db.Model):
     __tablename__ = "cart_item"
@@ -120,7 +128,7 @@ class CartItem(db.Model):
 
 
 # ===================================
-# ORDERS
+# ORDER MODEL
 # ===================================
 class Order(db.Model):
     __tablename__ = "order"
@@ -135,7 +143,8 @@ class Order(db.Model):
 
     retailer_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id")
+        db.ForeignKey("user.id"),
+        nullable=True
     )
 
     product_id = db.Column(
@@ -157,11 +166,12 @@ class Order(db.Model):
     status = db.Column(
         db.String(50),
         default="Pending"
+        # Pending → Processing → Shipped → Delivered
     )
 
 
 # ===================================
-# REVIEWS
+# REVIEW MODEL
 # ===================================
 class Review(db.Model):
     __tablename__ = "review"
@@ -170,21 +180,23 @@ class Review(db.Model):
 
     buyer_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id")
+        db.ForeignKey("user.id"),
+        nullable=False
     )
 
     product_id = db.Column(
         db.Integer,
-        db.ForeignKey("product.id")
+        db.ForeignKey("product.id"),
+        nullable=False
     )
 
-    rating = db.Column(db.Integer)
+    rating = db.Column(db.Integer, nullable=False)
 
     comment = db.Column(db.Text)
 
 
 # ===================================
-# CHAT
+# CHAT MODEL
 # ===================================
 class Chat(db.Model):
     __tablename__ = "chat"
@@ -193,12 +205,14 @@ class Chat(db.Model):
 
     sender_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id")
+        db.ForeignKey("user.id"),
+        nullable=False
     )
 
     receiver_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id")
+        db.ForeignKey("user.id"),
+        nullable=False
     )
 
     message = db.Column(
