@@ -95,9 +95,13 @@ def admin():
     return render_template("admin_dashboard.html")
 
 
-@app.route("/retailer")
-def retailer():
-    return render_template("retailer_dashboard.html")
+@retailer_bp.route("/retailer/dashboard")
+@login_required
+def dashboard():
+
+    orders = Order.query.filter_by(retailer_id=current_user.id).all()
+
+    return render_template("retailer_dashboard.html", orders=orders)
 
 
 @app.route("/buyer")
