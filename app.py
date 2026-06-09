@@ -11,6 +11,7 @@ from security import role_required
 from flask import Flask, render_template, redirect, url_for
 from auth import create_admin
 from admin import admin_bp
+from cart import cart
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -20,6 +21,7 @@ login_manager.init_app(app)
 
 app.register_blueprint(auth)
 app.register_blueprint(admin_bp)
+app.register_blueprint(cart)
 
 @login_manager.user_loader
 def load_user(user_id):
