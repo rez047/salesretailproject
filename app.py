@@ -9,6 +9,7 @@ from auth import auth
 from utils import allowed_file
 from security import role_required
 from flask import Flask, render_template
+from auth import create_admin
 
 app = Flask(__name__)
 app.config.from_object(Config)
