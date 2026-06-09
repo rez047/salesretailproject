@@ -1,21 +1,112 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Cart</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+    <title>Cart</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            margin: 0;
+        }
+
+        header {
+            background: #0b3d91;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #0b3d91;
+            color: white;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .remove {
+            background: red;
+        }
+
+        .checkout {
+            background: green;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: #ddd;
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Your Cart</h1>
+    Your Cart
 </header>
 
-<div class="container">
-  <div id="cart"></div>
+<div class="topbar">
+    <a href="/buyer">Back to Shop</a>
+
+    <form method="POST" action="/checkout">
+        <button class="btn checkout" type="submit">Checkout</button>
+    </form>
 </div>
 
-<script src="/static/js/cart.js"></script>
+<div class="container">
+
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+        </tr>
+
+        {% for item in items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.subtotal }}</td>
+
+            <td>
+                <a class="btn remove" href="/cart/remove/{{ item.id }}">
+                    Remove
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <h3>Total: {{ total }}</h3>
+
+</div>
 
 </body>
 </html>
