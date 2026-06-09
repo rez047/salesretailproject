@@ -1,41 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Retailer Dashboard</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+    <title>Retailer Dashboard</title>
 </head>
 
 <body>
 
-<header>
-  <h1>Retailer Panel</h1>
-</header>
+<h1>Retailer Dashboard</h1>
 
-<div class="container">
-  <div class="card">
-    <h2>Add Product</h2>
+<h2>Incoming Orders</h2>
 
-    <input id="name" placeholder="Product Name">
-    <input id="price" placeholder="Price">
-    <input id="stock" placeholder="Stock">
+<table border="1">
+    <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Update</th>
+    </tr>
 
-    <button onclick="addProduct()">Add</button>
-  </div>
-</div>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.product_id }}</td>
+        <td>{{ order.quantity }}</td>
+        <td>{{ order.total_price }}</td>
+        <td>{{ order.status }}</td>
 
-<script>
-function addProduct() {
-  fetch("/product/add", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      name: document.getElementById("name").value,
-      price: document.getElementById("price").value,
-      stock: document.getElementById("stock").value
-    })
-  }).then(res => res.json()).then(alert);
-}
-</script>
+        <td>
+            <form method="POST" action="/retailer/order/{{ order.id }}/status">
+                <select name="status">
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                </select>
+                <button type="submit">Update</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
 
 </body>
 </html>
