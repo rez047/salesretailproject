@@ -55,16 +55,16 @@ def register():
     return render_template("register.html")
 
 def create_admin():
+
     admin_email = os.getenv("ADMIN_EMAIL")
     admin_password = os.getenv("ADMIN_PASSWORD")
 
-    print("ADMIN EMAIL FROM ENV:", admin_email)
-    print("ADMIN PASSWORD FROM ENV:", admin_password)
+    if not admin_email or not admin_password:
+        return
 
     admin = User.query.filter_by(email=admin_email).first()
 
     if admin:
-        print("Admin already exists")
         return
 
     admin = User(
@@ -77,8 +77,6 @@ def create_admin():
 
     db.session.add(admin)
     db.session.commit()
-
-    print("Admin created successfully")
 
 
 @auth.route("/logout")
