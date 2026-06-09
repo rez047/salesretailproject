@@ -18,8 +18,10 @@ from security import role_required
 
 app = Flask(__name__)
 
+app = Flask(__name__)
 app.config.from_object(Config)
 
+# 🔐 SESSION SETTINGS
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="LAX",
