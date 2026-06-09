@@ -150,7 +150,75 @@ def add_to_cart(product_id):
 
     return redirect("/cart")
 
+@cart.route("/cart")
+@login_required
+def view_cart():
 
+    items = CartItem.query.filter_by(user_id=current_user.id).all()
+
+    cart_data = []
+    total = 0
+
+    for item in items:
+        product = Product.query.get(item.product_id)
+
+        subtotal = product.price * item.quantity
+        total += subtotal
+
+        cart_data.append({
+            "id": item.id,
+            "name": product.name,
+            "price": product.price,
+            "quantity": item.quantity,
+            "subtotal": subtotal
+        })
+
+    return render_template("cart.html", items=cart_data, total=total)
+
+
+@cart.route("/cart/remove/<int:item_id>")
+@login_required
+def remove_item(item_id):
+
+    item = CartItem.query.get(item_id)
+
+    if item:
+        db.session.delete(item)
+        db.session.commit()
+
+    return redirect("/cart")
+
+
+@cart.route("/checkout", methods=["POST"])
+@login_required
+def checkout():
+
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+
+    if not cart_items:
+        return "Cart is empty", 400
+
+    for item in cart_items:
+
+        product = Product.query.get(item.product_id)
+
+        order = Order(
+            user_id=current_user.id,
+            product_id=product.id,
+            quantity=item.quantity,
+            total_price=product.price * item.quantity,
+            status="pending",
+            retailer_id=product.retailer_id if hasattr(product, "retailer_id") else None
+        )
+
+        db.session.add(order)
+
+        db.session.delete(item)
+
+    db.session.commit()
+
+    return redirect("/buyer")
+    
 # =========================
 # DATABASE INIT (CLEAN)
 # =========================
