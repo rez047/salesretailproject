@@ -48,16 +48,6 @@ class Review(db.Model):
     rating = db.Column(db.Integer)
     comment = db.Column(db.Text)
 
-
-class CartItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    product_id = db.Column(db.Integer, db.ForeignKey("product.id"))
-
-    quantity = db.Column(db.Integer, default=1)
-
-
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -71,3 +61,12 @@ class Order(db.Model):
     # pending | processing | shipped | delivered
 
     retailer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+
+class CartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
+
+    quantity = db.Column(db.Integer, default=1)
+
