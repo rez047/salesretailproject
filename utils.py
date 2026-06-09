@@ -1,28 +1,44 @@
-
 import os
-import resend
+from resend import Resend
 
-resend.api_key = os.getenv("re_8gx5tnEB_61hzHWncpE4U7fWs8LRGFFJp")
+# =========================
+# FILE UPLOAD HELPERS (optional)
+# =========================
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    return (
+        "." in filename and
+        filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+    )
+
+
+# =========================
+# EMAIL (RESEND SERVICE)
+# =========================
+
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+
+resend_client = Resend(re_8gx5tnEB_61hzHWncpE4U7fWs8LRGFFJp)
+
 
 def send_verification_email(to_email, token):
-    verification_link = f"https://your-app.onrender.com/verify/{token}"
+    """
+    Sends verification email using Resend API.
+    """
 
-    resend.Emails.send({
-        "from": "Shop System <onboarding@resend.dev>",
-        "to": to_email,
+    verify_url = f"https://emiratessales888.onrender.com/verify/{token}"
+
+    response = resend_client.emails.send({
+        "from": "Emirates Shop <onboarding@resend.dev>",
+        "to": [to_email],
         "subject": "Verify your account",
         "html": f"""
             <h2>Verify Your Account</h2>
-            <p>Click the link below to activate your account:</p>
-            <a href="{verification_link}">Verify Email</a>
+            <p>Click the link below to verify your email:</p>
+            <a href="{verify_url}">{verify_url}</a>
         """
     })
 
-
-
-
+    return response
