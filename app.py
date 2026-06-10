@@ -17,8 +17,6 @@ from retailer import retailer_bp
 from security import role_required
 
 app = Flask(__name__)
-
-app = Flask(__name__)
 app.config.from_object(Config)
 
 # 🔐 SESSION SETTINGS
@@ -95,38 +93,22 @@ def admin_dashboard():
 # ===================================
 
 def init_db():
-
     with app.app_context():
 
-        # Create tables
         db.create_all()
 
-
-        # Create or update admin account
-        create_admin()
-
-
-        # Fix existing admin account permissions
         admin = User.query.filter_by(
             email=os.getenv("ADMIN_EMAIL")
         ).first()
 
-
         if admin:
-
             admin.role = "admin"
-
             admin.approved = True
-
             admin.is_verified = True
-
             admin.is_active = True
-
-
             db.session.commit()
-
-
-            print("Admin account verified and activated")
+        else:
+            create_admin()
 
 
 if __name__ == "__main__":
