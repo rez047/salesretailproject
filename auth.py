@@ -27,28 +27,52 @@ def login():
 
         user = User.query.filter_by(email=email).first()
 
-        if user and user.check_password(password):
+        if not user:
+            return "Invalid credentials", 401
 
-            if not user.is_verified:
-                return "Verify your email first."
 
-            if user.role != "admin" and not user.approved:
-                return "Waiting for admin approval."
+        if not user.check_password(password):
+            return "Invalid credentials", 401
+
+
+        # ==========================
+        # ADMIN BYPASS
+        # ==========================
+        if user.role == "admin":
+
+            user.is_active = True
+            db.session.commit()
 
             login_user(user)
 
-            if user.role == "admin":
-                return redirect("/admin")
+            return redirect("/admin")
 
-            elif user.role == "retailer":
-                return redirect("/retailer/dashboard")
 
-            return redirect("/buyer")
+        # ==========================
+        # NORMAL USERS
+        # ==========================
+        if not user.is_verified:
+            return "Verify your email first."
 
-        return "Invalid credentials", 401
+
+        if not user.approved:
+            return "Waiting for admin approval."
+
+
+        user.is_active = True
+        db.session.commit()
+
+        login_user(user)
+
+
+        if user.role == "retailer":
+            return redirect("/retailer/dashboard")
+
+
+        return redirect("/buyer")
+
 
     return render_template("login.html")
-
 
 # ===================================
 # REGISTER
@@ -124,25 +148,43 @@ def create_admin():
     if not admin_email or not admin_password:
         return
 
+
     admin = User.query.filter_by(
         email=admin_email
     ).first()
 
+
     if admin:
+
+        admin.role="admin"
+        admin.approved=True
+        admin.is_verified=True
+        admin.is_active=True
+
+        db.session.commit()
+
+        print("Existing admin updated")
+
         return
+
+
 
     admin = User(
         username="admin",
         email=admin_email,
         role="admin",
         approved=True,
-        is_verified=True
+        is_verified=True,
+        is_active=True
     )
+
 
     admin.set_password(admin_password)
 
+
     db.session.add(admin)
     db.session.commit()
+
 
     print("Admin account created")
 
