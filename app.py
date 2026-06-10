@@ -4,7 +4,7 @@ from config import Config
 
 from extensions import db, login_manager
 
-from models import User, Product
+from models import User, Product, db
 
 from auth import auth, create_admin
 from admin import admin_bp
