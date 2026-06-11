@@ -85,7 +85,7 @@ def register():
         username = request.form.get("username")
         email = request.form.get("email")
         password = request.form.get("password")
-        role = request.form.get("role")
+        role = request.form.get("role") or "buyer"
 
         existing = User.query.filter_by(email=email).first()
 
