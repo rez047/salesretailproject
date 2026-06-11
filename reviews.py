@@ -8,7 +8,7 @@ reviews = Blueprint("reviews", __name__)
 # =========================
 # REVIEW PAGE (optional UI route)
 # =========================
-@reviews.route("/buyer/review/product/<int:product_id>")
+@reviews_bp.route("/review/product/<int:product_id>", endpoint="review_page")
 @login_required
 def review_page(product_id):
     return render_template("review_product.html", product_id=product_id)
