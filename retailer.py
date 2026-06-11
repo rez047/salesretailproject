@@ -13,17 +13,13 @@ retailer_bp = Blueprint("retailer", __name__)
 @login_required
 def dashboard():
 
-    # 🔥 CRITICAL FIX: join through Product
     orders = (
         db.session.query(Order)
-        .join(Product, Order.product_id == Product.id)
-        .filter(Product.retailer_id == current_user.id)
+        .join(Product)
         .all()
     )
 
-    products = Product.query.filter_by(
-        retailer_id=current_user.id
-    ).all()
+    products = Product.query.all()
 
     return render_template(
         "retailer_dashboard.html",
