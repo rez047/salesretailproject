@@ -1,37 +1,56 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Orders</title>
-</head>
+from flask import Blueprint, request, jsonify
+from flask_login import login_required, current_user
+from models import db, Review
 
-<body>
+reviews = Blueprint("reviews", __name__)
 
-<h2>My Order History</h2>
 
-<a href="/buyer">← Back to Shop</a>
+# =====================
+# ADD REVIEW (5 STAR FIX)
+# =====================
+@reviews.route("/review/add", methods=["POST"])
+@login_required
+def add_review():
 
-<table border="1">
-    <tr>
-        <th>Order ID</th>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Total</th>
-        <th>Status</th>
-    </tr>
+    data = request.json
 
-    {% for order in orders %}
-    <tr>
-        <td>{{ order.id }}</td>
-        <td>{{ order.product.name }}</td>
-        <td>{{ order.product.price }}</td>
-        <td>{{ order.quantity }}</td>
-        <td>{{ order.total_price }}</td>
-        <td>{{ order.status }}</td>
-    </tr>
-    {% endfor %}
+    rating = int(data["rating"])
 
-</table>
+    if rating < 1 or rating > 5:
+        return jsonify({"error": "Rating must be 1-5"}), 400
 
-</body>
-</html>
+    review = Review(
+        buyer_id=current_user.id,
+        product_id=data["product_id"],
+        rating=rating,
+        comment=data.get("comment", "")
+    )
+
+    db.session.add(review)
+    db.session.commit()
+
+    return jsonify({"message": "review added"})
+
+
+# =====================
+# GET REVIEWS
+# =====================
+@reviews.route("/review/<int:product_id>")
+def get_reviews(product_id):
+
+    reviews = Review.query.filter_by(product_id=product_id).all()
+
+    avg = 0
+    if reviews:
+        avg = sum([r.rating for r in reviews]) / len(reviews)
+
+    return jsonify({
+        "average": round(avg, 1),
+        "reviews": [
+            {
+                "rating": r.rating,
+                "comment": r.comment
+            }
+            for r in reviews
+        ]
+    })
