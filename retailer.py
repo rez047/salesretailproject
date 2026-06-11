@@ -6,18 +6,19 @@ from models import db, Order, Product, User
 retailer_bp = Blueprint("retailer", __name__)
 
 
-# =========================================================
-# RETAILER DASHBOARD (FIXED: orders via product ownership)
-# =========================================================
-
+# =====================================
+# RETAILER DASHBOARD (FIXED)
+# =====================================
 @retailer_bp.route("/retailer/dashboard")
 @login_required
 def dashboard():
 
+    # GET ORDERS THROUGH PRODUCT RELATION (CORRECT WAY)
     orders = Order.query.join(Product).filter(
         Product.retailer_id == current_user.id
     ).all()
 
+    # GET ONLY THIS RETAILER PRODUCTS
     products = Product.query.filter_by(
         retailer_id=current_user.id
     ).all()
@@ -29,13 +30,10 @@ def dashboard():
     )
 
 
-# =========================================================
-# UPDATE ORDER STATUS (SECURE FIX)
-# =========================================================
-@retailer_bp.route(
-    "/retailer/order/<int:order_id>/status",
-    methods=["POST"]
-)
+# =====================================
+# UPDATE ORDER STATUS (FIXED SECURITY)
+# =====================================
+@retailer_bp.route("/retailer/order/<int:order_id>/status", methods=["POST"])
 @login_required
 def update_status(order_id):
 
@@ -44,28 +42,20 @@ def update_status(order_id):
     if not order:
         return "Order not found", 404
 
-    # ensure retailer owns the product in the order
-    product = Product.query.get(order.product_id)
-
-    if not product or product.retailer_id != current_user.id:
+    # SECURITY: ensure retailer owns this product
+    if order.product.retailer_id != current_user.id:
         return "Unauthorized", 403
 
-    status = request.form.get("status")
+    order.status = request.form.get("status")
 
-    allowed_statuses = ["pending", "processing", "shipped", "delivered"]
-
-    if status not in allowed_statuses:
-        return "Invalid status", 400
-
-    order.status = status
     db.session.commit()
 
     return redirect(url_for("retailer.dashboard"))
 
 
-# =========================================================
-# RETAILER PRODUCTS PAGE
-# =========================================================
+# =====================================
+# RETAILER PRODUCTS
+# =====================================
 @retailer_bp.route("/retailer/products")
 @login_required
 def products():
