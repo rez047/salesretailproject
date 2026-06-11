@@ -104,6 +104,13 @@ class Review(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text)
 
+    created_at = db.Column(db.DateTime, default=db.func.now())
+
+    # prevents duplicate reviews per user per product
+    __table_args__ = (
+        db.UniqueConstraint('buyer_id', 'product_id', name='unique_user_product_review'),
+    )
+
 
 # ===================================
 # CHAT MODEL
