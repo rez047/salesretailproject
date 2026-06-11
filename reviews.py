@@ -6,36 +6,25 @@ reviews = Blueprint("reviews", __name__)
 
 
 # =========================
-# ADD REVIEW (VERIFIED BUYER ONLY)
+# REVIEW PAGE (optional UI route)
 # =========================
-@reviews.route("/buyer/review/product/<int:product_id>")
+@reviews.route("/review/product/<int:product_id>")
 @login_required
-def review_product_page(product_id):
+def review_page(product_id):
+    return render_template("review_product.html", product_id=product_id)
 
-    order = Order.query.filter_by(
-        user_id=current_user.id,
-        product_id=product_id,
-        status="delivered"
-    ).first()
 
-    if not order:
-        return "Only buyers with delivered orders can review this product", 403
-
-    return render_template(
-        "review_product.html",
-        product_id=product_id
-    )
-    
-
+# =========================
+# ADD / UPDATE REVIEW (DELIVERED ONLY)
+# =========================
 @reviews.route("/review/add", methods=["POST"])
 @login_required
 def add_review():
 
     data = request.json
-
     product_id = data["product_id"]
 
-    # 🔒 CHECK IF USER BOUGHT PRODUCT
+    # verify delivered purchase
     order = Order.query.filter_by(
         user_id=current_user.id,
         product_id=product_id,
@@ -43,33 +32,33 @@ def add_review():
     ).first()
 
     if not order:
-        return jsonify({"error": "Only verified buyers can review"}), 403
+        return jsonify({"error": "Only delivered buyers can review"}), 403
 
-    # prevent duplicate review
-    existing = Review.query.filter_by(
+    # one review per user per product (update allowed)
+    review = Review.query.filter_by(
         buyer_id=current_user.id,
         product_id=product_id
     ).first()
 
-    if existing:
-        existing.rating = data["rating"]
-        existing.comment = data["comment"]
+    if review:
+        review.rating = int(data["rating"])
+        review.comment = data["comment"]
     else:
         review = Review(
             buyer_id=current_user.id,
             product_id=product_id,
-            rating=data["rating"],
+            rating=int(data["rating"]),
             comment=data["comment"]
         )
         db.session.add(review)
 
     db.session.commit()
 
-    return jsonify({"message": "review saved"})
+    return jsonify({"message": "saved"})
 
 
 # =========================
-# GET REVIEWS + STATS
+# GET REVIEWS + AVERAGE
 # =========================
 @reviews.route("/review/<int:product_id>")
 def get_reviews(product_id):
@@ -80,22 +69,16 @@ def get_reviews(product_id):
         return jsonify({
             "average": 0,
             "count": 0,
-            "ratings": [],
             "reviews": []
         })
 
-    total = sum(r.rating for r in reviews)
-    avg = round(total / len(reviews), 1)
+    avg = sum(r.rating for r in reviews) / len(reviews)
 
     return jsonify({
-        "average": avg,
+        "average": round(avg, 1),
         "count": len(reviews),
-        "ratings": [r.rating for r in reviews],
         "reviews": [
-            {
-                "rating": r.rating,
-                "comment": r.comment
-            }
+            {"rating": r.rating, "comment": r.comment}
             for r in reviews
         ]
     })
