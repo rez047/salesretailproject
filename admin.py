@@ -69,16 +69,26 @@ def delete_user(id):
     return redirect("/admin")
 
 
-@admin_bp.route("/approve_retailer/<int:id>")
+@admin_bp.route("/approve_user/<int:id>")
 @login_required
 @role_required("admin")
-def approve_retailer(id):
+def approve_user(id):
 
     user = User.query.get(id)
 
-    if user and user.role == "retailer":
-        user.approved = True
-        db.session.commit()
+    if not user:
+        return redirect("/admin")
+
+    # Do NOT allow approving admins (safety)
+    if user.role == "admin":
+        return redirect("/admin")
+
+    # Approve BOTH buyers and retailers
+    user.approved = True
+    user.is_verified = True
+    user.is_active = True
+
+    db.session.commit()
 
     return redirect("/admin")
 
