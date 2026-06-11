@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review Product</title>
+</head>
+<body>
+
+<h2>Review Product</h2>
+
+<select id="rating">
+    <option value="5">★★★★★</option>
+    <option value="4">★★★★</option>
+    <option value="3">★★★</option>
+    <option value="2">★★</option>
+    <option value="1">★</option>
+</select>
+
+<br><br>
+
+<textarea
+    id="comment"
+    rows="5"
+    cols="50"
+    placeholder="Write your review">
+</textarea>
+
+<br><br>
+
+<button onclick="submitReview()">
+    Submit Review
+</button>
+
+<script>
+
+function submitReview() {
+
+    fetch("/review/add", {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            product_id: {{ product_id }},
+            rating: document.getElementById("rating").value,
+            comment: document.getElementById("comment").value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        alert("Review submitted");
+
+        window.location.href="/buyer/orders";
+    });
+}
+
+</script>
+
+</body>
+</html>
