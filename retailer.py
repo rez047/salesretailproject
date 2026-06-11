@@ -1,25 +1,28 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
-from models import db, Order, Product
+from models import db, Order, Product, User
 
 retailer_bp = Blueprint("retailer", __name__)
 
 
-# =====================================
-# RETAILER DASHBOARD
-# =====================================
-
+# =========================================================
+# RETAILER DASHBOARD (FIXED: orders via product ownership)
+# =========================================================
 @retailer_bp.route("/retailer/dashboard")
 @login_required
 def dashboard():
 
-    orders = Order.query.filter_by(
+    # Get all products owned by this retailer
+    products = Product.query.filter_by(
         retailer_id=current_user.id
     ).all()
 
-    products = Product.query.filter_by(
-        retailer_id=current_user.id
+    product_ids = [p.id for p in products]
+
+    # Get orders that belong to those products
+    orders = Order.query.filter(
+        Order.product_id.in_(product_ids)
     ).all()
 
     return render_template(
@@ -29,10 +32,9 @@ def dashboard():
     )
 
 
-# =====================================
-# UPDATE ORDER STATUS
-# =====================================
-
+# =========================================================
+# UPDATE ORDER STATUS (SECURE FIX)
+# =========================================================
 @retailer_bp.route(
     "/retailer/order/<int:order_id>/status",
     methods=["POST"]
@@ -45,21 +47,28 @@ def update_status(order_id):
     if not order:
         return "Order not found", 404
 
+    # ensure retailer owns the product in the order
+    product = Product.query.get(order.product_id)
+
+    if not product or product.retailer_id != current_user.id:
+        return "Unauthorized", 403
+
     status = request.form.get("status")
 
-    order.status = status
+    allowed_statuses = ["pending", "processing", "shipped", "delivered"]
 
+    if status not in allowed_statuses:
+        return "Invalid status", 400
+
+    order.status = status
     db.session.commit()
 
-    return redirect(
-        url_for("retailer.dashboard")
-    )
+    return redirect(url_for("retailer.dashboard"))
 
 
-# =====================================
-# RETAILER PRODUCTS
-# =====================================
-
+# =========================================================
+# RETAILER PRODUCTS PAGE
+# =========================================================
 @retailer_bp.route("/retailer/products")
 @login_required
 def products():
