@@ -6,12 +6,17 @@ from models import db, Product, CartItem, Order
 cart = Blueprint("cart", __name__)
 
 
-# =========================
-# ADD TO CART (INCREASE QTY)
-# =========================
+# =====================================
+# ADD TO CART
+# =====================================
 @cart.route("/cart/add/<int:product_id>")
 @login_required
 def add_to_cart(product_id):
+
+    product = Product.query.get(product_id)
+
+    if not product:
+        return "Product not found", 404
 
     item = CartItem.query.filter_by(
         user_id=current_user.id,
@@ -33,9 +38,9 @@ def add_to_cart(product_id):
     return redirect(url_for("cart.view_cart"))
 
 
-# =========================
-# VIEW CART (FULL FIXED)
-# =========================
+# =====================================
+# VIEW CART (FIXED - ORM SAFE)
+# =====================================
 @cart.route("/cart")
 @login_required
 def view_cart():
@@ -44,39 +49,28 @@ def view_cart():
         user_id=current_user.id
     ).all()
 
-    cart_items = []
     total = 0
 
     for item in items:
-
         product = Product.query.get(item.product_id)
 
         if not product:
             continue
 
-        subtotal = product.price * item.quantity
-        total += subtotal
-
-        cart_items.append({
-            "id": item.id,
-            "product_id": product.id,
-            "name": product.name,
-            "price": product.price,
-            "quantity": item.quantity,
-            "subtotal": subtotal,
-            "image": product.image
-        })
+        item.product = product  # attach ORM object
+        item.subtotal = product.price * item.quantity
+        total += item.subtotal
 
     return render_template(
         "cart.html",
-        items=cart_items,
+        items=items,
         total=total
     )
 
 
-# =========================
+# =====================================
 # REMOVE ITEM
-# =========================
+# =====================================
 @cart.route("/cart/remove/<int:item_id>")
 @login_required
 def remove_item(item_id):
@@ -90,21 +84,21 @@ def remove_item(item_id):
     return redirect(url_for("cart.view_cart"))
 
 
-# =========================
-# CHECKOUT (NO JS)
-# =========================
+# =====================================
+# CHECKOUT (FIXED & CLEAN)
+# =====================================
 @cart.route("/checkout", methods=["POST"])
 @login_required
 def checkout():
 
-    cart_items = CartItem.query.filter_by(
+    items = CartItem.query.filter_by(
         user_id=current_user.id
     ).all()
 
-    if not cart_items:
+    if not items:
         return "Cart is empty", 400
 
-    for item in cart_items:
+    for item in items:
 
         product = Product.query.get(item.product_id)
 
