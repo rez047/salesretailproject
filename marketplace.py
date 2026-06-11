@@ -56,9 +56,10 @@ def place_order():
     data = request.json
 
     order = Order(
-        buyer_id=current_user.id,
+        user_id=current_user.id,
         product_id=data["product_id"],
         quantity=data["quantity"],
+        total_price=0,
         status="pending"
     )
 
