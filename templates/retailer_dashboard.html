@@ -2,6 +2,41 @@
 <html>
 <head>
     <title>StoreKeeper Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        h1 {
+            background: #0b3d91;
+            color: white;
+            padding: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #0b3d91;
+            color: white;
+        }
+
+        select, button {
+            padding: 6px;
+        }
+    </style>
 </head>
 
 <body>
@@ -10,10 +45,13 @@
 
 <h2>Incoming Orders</h2>
 
-<table border="1">
+<table>
     <tr>
         <th>Order ID</th>
+        <th>Customer</th>
+        <th>Email</th>
         <th>Product</th>
+        <th>Price</th>
         <th>Quantity</th>
         <th>Total</th>
         <th>Status</th>
@@ -23,8 +61,15 @@
     {% for order in orders %}
     <tr>
         <td>{{ order.id }}</td>
-        <td>{{ order.product_id }}</td>
+
+        <td>{{ order.buyer.username }}</td>
+        <td>{{ order.buyer.email }}</td>
+
+        <td>{{ order.product.name }}</td>
+        <td>{{ order.product.price }}</td>
+
         <td>{{ order.quantity }}</td>
+
         <td>{{ order.total_price }}</td>
         <td>{{ order.status }}</td>
 
@@ -41,7 +86,6 @@
         </td>
     </tr>
     {% endfor %}
-
 </table>
 
 </body>
