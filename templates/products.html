@@ -47,7 +47,7 @@
 
     .review-box, .qna-box {
       margin-top: 10px;
-      padding: 8px;
+      padding: 10px;
       background: #f8f8f8;
       border-radius: 5px;
     }
@@ -61,6 +61,11 @@
       padding: 6px;
       margin-top: 5px;
       margin-bottom: 5px;
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-top: 8px;
     }
   </style>
 </head>
@@ -100,7 +105,7 @@ fetch("/products")
 
       <!-- ⭐ REVIEWS -->
       <div class="review-box">
-        <h4>Reviews</h4>
+        <h4>⭐ Reviews</h4>
 
         <div id="reviews-${p.id}">Loading...</div>
 
@@ -121,7 +126,8 @@ fetch("/products")
 
       <!-- 💬 Q&A -->
       <div class="qna-box">
-        <h4>Questions</h4>
+        <h4>💬 Product Q&A</h4>
+        <p>Ask questions about this product</p>
 
         <div id="chat-${p.id}">Loading...</div>
 
@@ -140,6 +146,10 @@ fetch("/products")
   });
 });
 
+
+/* =========================
+   CART
+========================= */
 function addToCart(id) {
   window.location.href = "/cart/add/" + id;
 }
@@ -155,17 +165,17 @@ function loadReviews(productId) {
 
     let box = document.getElementById("reviews-" + productId);
 
-    if (data.length === 0) {
+    if (!data.length) {
       box.innerHTML = "No reviews yet";
       return;
     }
 
-    box.innerHTML = data.map(r => {
-      return `<div>
+    box.innerHTML = data.map(r => `
+      <div>
         <span class="stars">${"★".repeat(r.rating)}</span>
         <p>${r.comment}</p>
-      </div>`;
-    }).join("");
+      </div>
+    `).join("");
   });
 }
 
@@ -189,20 +199,27 @@ function submitReview(productId) {
   });
 }
 
+
 /* =========================
-   Q&A CHAT
+   Q&A CHAT (FIXED)
 ========================= */
 
 function loadChat(productId) {
+
   fetch("/chat/" + productId)
   .then(res => res.json())
   .then(data => {
 
     let box = document.getElementById("chat-" + productId);
 
-    box.innerHTML = data.map(m => {
-      return `<p><b>User ${m.from}:</b> ${m.msg}</p>`;
-    }).join("");
+    if (!data.length) {
+      box.innerHTML = "No questions yet";
+      return;
+    }
+
+    box.innerHTML = data.map(m => `
+      <p><b>User ${m.from}:</b> ${m.msg}</p>
+    `).join("");
   });
 }
 
@@ -210,15 +227,20 @@ function sendQuestion(productId) {
 
   let msg = document.getElementById("msg-" + productId).value;
 
+  if (!msg.trim()) return;
+
   fetch("/chat/send", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
-      receiver_id: 1,
+      product_id: productId,
       message: msg
     })
   })
-  .then(() => loadChat(productId));
+  .then(() => {
+    document.getElementById("msg-" + productId).value = "";
+    loadChat(productId);
+  });
 }
 
 </script>
