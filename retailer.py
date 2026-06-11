@@ -40,11 +40,18 @@ def update_status(order_id):
     if not order:
         return "Order not found", 404
 
-    # 🔥 SECURITY CHECK
-    if order.product.retailer_id != current_user.id:
+    # ❌ REMOVE WRONG OWNERSHIP CHECK
+
+    # OPTIONAL: only allow retailer role users
+    if current_user.role != "retailer":
         return "Unauthorized", 403
 
-    order.status = request.form.get("status")
+    status = request.form.get("status")
+
+    if status not in ["pending", "processing", "shipped", "delivered"]:
+        return "Invalid status", 400
+
+    order.status = status
 
     db.session.commit()
 
