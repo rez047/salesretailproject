@@ -101,8 +101,8 @@
                 <td>
                     <a class="button delete" href="/delete_user/{{ user.id }}">Delete</a>
 
-                    {% if user.role == "retailer" and not user.approved %}
-                        <a class="button approve" href="/approve_retailer/{{ user.id }}">Approve</a>
+                    {% if user.role != "admin" and not user.approved %}
+                        <a class="button approve" href="/approve_user/{{ user.id }}">Approve</a>
                     {% endif %}
                 </td>
             </tr>
