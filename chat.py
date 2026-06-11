@@ -5,17 +5,19 @@ from utils import allowed_file
 
 chat = Blueprint("chat", __name__)
 
-# --------------------
-# SEND MESSAGE
-# --------------------
+
+# =========================
+# SEND MESSAGE (PRODUCT CHAT)
+# =========================
 @chat.route("/chat/send", methods=["POST"])
 @login_required
 def send_message():
+
     data = request.json
 
     msg = Chat(
+        product_id=data["product_id"],
         sender_id=current_user.id,
-        receiver_id=data["receiver_id"],
         message=data["message"]
     )
 
@@ -25,18 +27,22 @@ def send_message():
     return jsonify({"message": "sent"})
 
 
-# --------------------
-# GET MESSAGES
-# --------------------
-@chat.route("/chat/<int:user_id>", methods=["GET"])
+# =========================
+# GET MESSAGES FOR PRODUCT
+# =========================
+@chat.route("/chat/<int:product_id>", methods=["GET"])
 @login_required
-def get_chat(user_id):
-    messages = Chat.query.filter(
-        ((Chat.sender_id == current_user.id) & (Chat.receiver_id == user_id)) |
-        ((Chat.sender_id == user_id) & (Chat.receiver_id == current_user.id))
-    ).all()
+def get_chat(product_id):
+
+    messages = Chat.query.filter_by(
+        product_id=product_id
+    ).order_by(Chat.created_at.asc()).all()
 
     return jsonify([
-        {"from": m.sender_id, "to": m.receiver_id, "msg": m.message}
+        {
+            "from": m.sender_id,
+            "msg": m.message,
+            "time": m.created_at.strftime("%H:%M")
+        }
         for m in messages
     ])
