@@ -71,9 +71,9 @@
         <td class="status">{{ order.status }}</td>
 
         <td>
-            <button onclick="openReview({{ order.product.id }})">
+            <a href="review/product/{{ order.product.id }}">
                 Review Product
-            </button>
+            </a>
         </td>
     </tr>
     {% endfor %}
