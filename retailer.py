@@ -46,7 +46,7 @@ def update_status(order_id):
     if current_user.role != "retailer":
         return "Unauthorized", 403
 
-    status = request.form.get("status")
+    status = request.form.get("status","").lower()
 
     if status not in ["pending", "processing", "shipped", "delivered"]:
         return "Invalid status", 400
