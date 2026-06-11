@@ -24,7 +24,7 @@ resend.api_key = os.getenv("RESEND_API_KEY")
 # =========================
 def send_verification_email(email, token):
 
-    verify_url = f"https://https://emiratesretail777-2edj.onrender.com/verify/{token}"
+    verify_url = f"https://emiratesretail777-2edj.onrender.com/verify/{token}"
 
     response = resend.Emails.send({
         "from": "onboarding@resend.dev",
