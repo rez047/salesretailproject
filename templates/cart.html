@@ -4,61 +4,15 @@
     <title>Cart</title>
 
     <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f9;
-            margin: 0;
-        }
+        body { font-family: Arial; background:#f4f6f9; }
+        table { width:100%; background:white; border-collapse:collapse; }
+        th, td { border:1px solid #ddd; padding:10px; text-align:center; }
+        th { background:#0b3d91; color:white; }
 
-        header {
-            background: #0b3d91;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .container {
-            padding: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background: #0b3d91;
-            color: white;
-        }
-
-        .btn {
-            padding: 6px 10px;
-            text-decoration: none;
-            border-radius: 5px;
-            color: white;
-        }
-
-        .remove {
-            background: red;
-        }
-
-        .checkout {
-            background: green;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: #ddd;
-        }
+        .btn { padding:6px 10px; text-decoration:none; border-radius:5px; color:white; }
+        .remove { background:red; }
+        .shop { background:#0b3d91; padding:8px; color:white; text-decoration:none; }
+        .checkout { background:green; padding:8px; border:none; color:white; }
     </style>
 </head>
 
@@ -68,43 +22,48 @@
     Your Cart
 </header>
 
-<div class="topbar">
-    <a href="/buyer">Back to Shop</a>
-
-    <form method="POST" action="/checkout">
-        <button class="btn checkout" type="submit">Checkout</button>
-    </form>
+<div style="padding:10px;">
+    <a class="shop" href="/buyer">← Continue Shopping</a>
 </div>
 
 <div class="container">
 
-    <table>
-        <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Qty</th>
-            <th>Subtotal</th>
-            <th>Action</th>
-        </tr>
+<table>
+    <tr>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Qty</th>
+        <th>Subtotal</th>
+        <th>Action</th>
+    </tr>
 
-        {% for item in items %}
-        <tr>
-            <td>{{ item.name }}</td>
-            <td>{{ item.price }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.subtotal }}</td>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.product.price }}</td>
+        <td>{{ item.quantity }}</td>
 
-            <td>
-                <a class="btn remove" href="/cart/remove/{{ item.id }}">
-                    Remove
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
+        <td>{{ item.quantity * item.product.price }}</td>
 
-    </table>
+        <td>
+            <a class="btn remove" href="/cart/remove/{{ item.id }}">
+                Remove
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
 
-    <h3>Total: {{ total }}</h3>
+</table>
+
+<h3>Total:
+    {{ total }}
+</h3>
+
+<form method="POST" action="/checkout">
+    <button class="checkout" type="submit">
+        Checkout
+    </button>
+</form>
 
 </div>
 
