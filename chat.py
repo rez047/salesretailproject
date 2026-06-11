@@ -16,8 +16,9 @@ def send_message():
     data = request.json
 
     msg = Chat(
-        product_id=data["product_id"],
         sender_id=current_user.id,
+        receiver_id=data.get("receiver_id", 1),
+        product_id=data["product_id"],
         message=data["message"]
     )
 
@@ -28,21 +29,18 @@ def send_message():
 
 
 # =========================
-# GET MESSAGES FOR PRODUCT
+# LOAD PRODUCT CHAT
 # =========================
-@chat.route("/chat/<int:product_id>", methods=["GET"])
+@chat.route("/chat/product/<int:product_id>")
 @login_required
 def get_chat(product_id):
 
-    messages = Chat.query.filter_by(
-        product_id=product_id
-    ).order_by(Chat.created_at.asc()).all()
+    messages = Chat.query.filter_by(product_id=product_id).all()
 
     return jsonify([
         {
             "from": m.sender_id,
-            "msg": m.message,
-            "time": m.created_at.strftime("%H:%M")
+            "msg": m.message
         }
         for m in messages
     ])
