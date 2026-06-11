@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, request
-from flask_login import login_required
+from flask_login import login_required, current_user
 from models import User, Product, Order
 from extensions import db
 
@@ -70,11 +70,18 @@ def approve_retailer(id):
 @login_required
 @role_required("admin")
 def add_product():
+
     name = request.form["name"]
     price = request.form["price"]
     stock = request.form["stock"]
 
-    product = Product(name=name, price=price, stock=stock)
+    product = Product(
+        name=name,
+        price=float(price),
+        stock=int(stock),
+        retailer_id=current_user.id
+    )
+
     db.session.add(product)
     db.session.commit()
 
