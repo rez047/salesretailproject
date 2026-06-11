@@ -1,84 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Products - Retailshop</title>
+  <title>Products</title>
 
   <style>
-    body {
-      font-family: Arial;
-      margin: 0;
-      background: #f4f6f9;
-    }
+    body { font-family: Arial; background:#f4f6f9; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:15px; }
+    .card { background:white; padding:15px; border-radius:10px; }
+    .btn { background:green; color:white; padding:8px; border:none; cursor:pointer; }
 
-    header {
-      background: #0b3d91;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-
-    .container {
-      padding: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .btn {
-      background: green;
-      color: white;
-      padding: 8px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 8px;
-      display: inline-block;
-    }
-
-    .review-box, .qna-box {
-      margin-top: 10px;
-      padding: 10px;
-      background: #f8f8f8;
-      border-radius: 5px;
-    }
-
-    .stars {
-      color: gold;
-    }
-
-    textarea, input, select {
-      width: 100%;
-      padding: 6px;
-      margin-top: 5px;
-      margin-bottom: 5px;
-    }
-
-    .section-title {
-      font-weight: bold;
-      margin-top: 8px;
-    }
+    .box { margin-top:10px; background:#f8f8f8; padding:8px; border-radius:5px; }
+    .stars { color:gold; }
   </style>
 </head>
 
 <body>
 
-<header>
-  <h1>Products</h1>
-</header>
+<h2>Products</h2>
 
-<div class="container">
-  <div class="grid" id="products"></div>
-</div>
+<div class="grid" id="products"></div>
 
 <script>
 fetch("/products")
@@ -89,154 +29,125 @@ fetch("/products")
 
   data.forEach(p => {
 
-    let div = document.createElement("div");
-    div.className = "card";
+    container.innerHTML += `
+      <div class="card">
 
-    div.innerHTML = `
-      <h3>${p.name}</h3>
-      <p>Price: ${p.price}</p>
-      <p>Stock: ${p.stock}</p>
+        <h3>${p.name}</h3>
+        <p>Price: ${p.price}</p>
 
-      <button class="btn" onclick="addToCart(${p.id})">
-        Add to Cart
-      </button>
+        <p id="avg-${p.id}">Loading rating...</p>
 
-      <!-- ⭐ REVIEWS -->
-      <div class="review-box">
-        <div class="section-title">⭐ Reviews</div>
-
-        <div id="reviews-${p.id}">Loading...</div>
-
-        <select id="rating-${p.id}">
-          <option value="5">★★★★★</option>
-          <option value="4">★★★★</option>
-          <option value="3">★★★</option>
-          <option value="2">★★</option>
-          <option value="1">★</option>
-        </select>
-
-        <textarea id="comment-${p.id}" placeholder="Write review"></textarea>
-
-        <button class="btn" onclick="submitReview(${p.id})">
-          Submit Review
+        <button class="btn" onclick="addToCart(${p.id})">
+          Add to Cart
         </button>
-      </div>
 
-      <!-- 💬 Q&A -->
-      <div class="qna-box">
-        <div class="section-title">💬 Product Q&A</div>
-        <p>Ask questions about this product</p>
+        <!-- REVIEWS -->
+        <div class="box">
+          <h4>⭐ Review</h4>
 
-        <div id="chat-${p.id}">Loading...</div>
+          <div id="reviews-${p.id}"></div>
 
-        <input id="msg-${p.id}" placeholder="Ask a question">
+          <select id="rating-${p.id}">
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★</option>
+            <option value="3">★★★</option>
+            <option value="2">★★</option>
+            <option value="1">★</option>
+          </select>
 
-        <button class="btn" onclick="sendQuestion(${p.id})">
-          Ask
-        </button>
+          <textarea id="comment-${p.id}" placeholder="Write review"></textarea>
+
+          <button class="btn" onclick="submitReview(${p.id})">
+            Save Review
+          </button>
+        </div>
+
+        <!-- CHAT -->
+        <div class="box">
+          <h4>💬 Q&A</h4>
+
+          <div id="chat-${p.id}"></div>
+
+          <input id="msg-${p.id}" placeholder="Ask question">
+
+          <button class="btn" onclick="sendQuestion(${p.id})">
+            Send
+          </button>
+        </div>
+
       </div>
     `;
-
-    container.appendChild(div);
 
     loadReviews(p.id);
     loadChat(p.id);
   });
 });
 
-/* =========================
-   CART
-========================= */
-function addToCart(id) {
+function addToCart(id){
   window.location.href = "/cart/add/" + id;
 }
 
 /* =========================
-   REVIEWS (PRODUCT-BASED)
+   REVIEWS
 ========================= */
-function loadReviews(productId) {
+
+function loadReviews(productId){
+
   fetch("/review/" + productId)
-  .then(res => res.json())
+  .then(r => r.json())
   .then(data => {
 
-    let box = document.getElementById("reviews-" + productId);
+    document.getElementById("avg-" + productId).innerHTML =
+      "⭐ " + data.average + " (" + data.count + ")";
 
-    if (!data.length) {
-      box.innerHTML = "No reviews yet";
-      return;
-    }
-
-    box.innerHTML = data.map(r => `
-      <div>
-        <span class="stars">${"★".repeat(r.rating)}</span>
-        <p>${r.comment}</p>
-      </div>
-    `).join("");
+    document.getElementById("reviews-" + productId).innerHTML =
+      data.reviews.map(r =>
+        `<p>⭐ ${r.rating} - ${r.comment}</p>`
+      ).join("");
   });
 }
 
-function submitReview(productId) {
-
-  let rating = document.getElementById("rating-" + productId).value;
-  let comment = document.getElementById("comment-" + productId).value;
+function submitReview(productId){
 
   fetch("/review/add", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
       product_id: productId,
-      rating: rating,
-      comment: comment
+      rating: document.getElementById("rating-"+productId).value,
+      comment: document.getElementById("comment-"+productId).value
     })
-  })
-  .then(res => res.json())
-  .then(() => {
-    loadReviews(productId);
-  });
+  }).then(() => loadReviews(productId));
 }
 
 /* =========================
-   Q&A FIX (IMPORTANT)
-   Uses PRODUCT ID as conversation key
+   CHAT
 ========================= */
 
-function loadChat(productId) {
+function loadChat(productId){
 
-  fetch("/chat/" + productId)
-  .then(res => res.json())
+  fetch("/chat/product/" + productId)
+  .then(r => r.json())
   .then(data => {
 
-    let box = document.getElementById("chat-" + productId);
-
-    if (!data.length) {
-      box.innerHTML = "No questions yet";
-      return;
-    }
-
-    box.innerHTML = data.map(m => `
-      <p><b>User ${m.from}:</b> ${m.msg}</p>
-    `).join("");
+    document.getElementById("chat-" + productId).innerHTML =
+      data.map(m => `<p>User ${m.from}: ${m.msg}</p>`).join("");
   });
 }
 
-function sendQuestion(productId) {
+function sendQuestion(productId){
 
   let msg = document.getElementById("msg-" + productId).value;
 
-  if (!msg.trim()) return;
-
   fetch("/chat/send", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
-      receiver_id: 1,
-      message: msg
+      product_id: productId,
+      message: msg,
+      receiver_id: 1
     })
-  })
-  .then(() => {
-    document.getElementById("msg-" + productId).value = "";
-    loadChat(productId);
-  });
+  }).then(() => loadChat(productId));
 }
 </script>
 
