@@ -60,6 +60,12 @@ def add_review():
     return jsonify({"message": "saved"})
 
 
+@reviews_bp.route("/ping")
+def ping():
+    return "reviews working"
+
+
+
 # =========================
 # GET REVIEWS + AVERAGE
 # =========================
