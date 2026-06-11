@@ -13,7 +13,7 @@ from admin import admin_bp
 from marketplace import market
 from cart import cart
 from chat import chat
-from reviews import reviews
+from reviews import reviews_bp
 from retailer import retailer_bp
 from buyer_orders import buyer_orders
 
@@ -109,7 +109,7 @@ app.register_blueprint(cart)
 
 app.register_blueprint(chat)
 
-app.register_blueprint(reviews)
+app.register_blueprint(reviews_bp)
 
 app.register_blueprint(retailer_bp)
 
