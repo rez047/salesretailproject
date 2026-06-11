@@ -1,51 +1,77 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from models import db, Review
+from models import db, Review, Order
 
 reviews = Blueprint("reviews", __name__)
 
 
-# =====================
-# ADD REVIEW (5 STAR FIX)
-# =====================
+# =========================
+# ADD REVIEW (VERIFIED BUYER ONLY)
+# =========================
 @reviews.route("/review/add", methods=["POST"])
 @login_required
 def add_review():
 
     data = request.json
 
-    rating = int(data["rating"])
+    product_id = data["product_id"]
 
-    if rating < 1 or rating > 5:
-        return jsonify({"error": "Rating must be 1-5"}), 400
+    # 🔒 CHECK IF USER BOUGHT PRODUCT
+    order = Order.query.filter_by(
+        user_id=current_user.id,
+        product_id=product_id,
+        status="delivered"
+    ).first()
 
-    review = Review(
+    if not order:
+        return jsonify({"error": "Only verified buyers can review"}), 403
+
+    # prevent duplicate review
+    existing = Review.query.filter_by(
         buyer_id=current_user.id,
-        product_id=data["product_id"],
-        rating=rating,
-        comment=data.get("comment", "")
-    )
+        product_id=product_id
+    ).first()
 
-    db.session.add(review)
+    if existing:
+        existing.rating = data["rating"]
+        existing.comment = data["comment"]
+    else:
+        review = Review(
+            buyer_id=current_user.id,
+            product_id=product_id,
+            rating=data["rating"],
+            comment=data["comment"]
+        )
+        db.session.add(review)
+
     db.session.commit()
 
-    return jsonify({"message": "review added"})
+    return jsonify({"message": "review saved"})
 
 
-# =====================
-# GET REVIEWS
-# =====================
+# =========================
+# GET REVIEWS + STATS
+# =========================
 @reviews.route("/review/<int:product_id>")
 def get_reviews(product_id):
 
     reviews = Review.query.filter_by(product_id=product_id).all()
 
-    avg = 0
-    if reviews:
-        avg = sum([r.rating for r in reviews]) / len(reviews)
+    if not reviews:
+        return jsonify({
+            "average": 0,
+            "count": 0,
+            "ratings": [],
+            "reviews": []
+        })
+
+    total = sum(r.rating for r in reviews)
+    avg = round(total / len(reviews), 1)
 
     return jsonify({
-        "average": round(avg, 1),
+        "average": avg,
+        "count": len(reviews),
+        "ratings": [r.rating for r in reviews],
         "reviews": [
             {
                 "rating": r.rating,
