@@ -18,9 +18,6 @@ from retailer import retailer_bp
 
 from security import role_required
 
-from flask_migrate import Migrate
-
-
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -42,8 +39,6 @@ app.config.update(
 # ==============================
 
 db.init_app(app)
-
-migrate = Migrate(app, db)
 
 login_manager.init_app(app)
 
