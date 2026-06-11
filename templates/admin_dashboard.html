@@ -60,6 +60,12 @@
         .delete { background: red; }
         .approve { background: green; }
         .add { background: orange; }
+
+        img.product-img {
+            width: 70px;
+            height: auto;
+            border-radius: 6px;
+        }
     </style>
 </head>
 
@@ -108,11 +114,17 @@
     <div class="card">
         <h2>Product Management</h2>
 
-        <form method="POST" action="/add_product">
+        <form method="POST" action="/add_product" enctype="multipart/form-data">
+
             <input type="text" name="name" placeholder="Product Name" required>
             <input type="number" name="price" placeholder="Price" required>
             <input type="number" name="stock" placeholder="Stock" required>
+
+            <!-- IMAGE UPLOAD (OPTIONAL) -->
+            <input type="file" name="image" accept="image/*">
+
             <button class="add" type="submit">Add Product</button>
+
         </form>
 
         <br>
@@ -120,6 +132,7 @@
         <table>
             <tr>
                 <th>ID</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Stock</th>
@@ -129,9 +142,21 @@
             {% for product in products %}
             <tr>
                 <td>{{ product.id }}</td>
+
+                <!-- IMAGE -->
+                <td>
+                    {% if product.image %}
+                        <img class="product-img"
+                             src="/static/uploads/products/{{ product.image }}">
+                    {% else %}
+                        No Image
+                    {% endif %}
+                </td>
+
                 <td>{{ product.name }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.stock }}</td>
+
                 <td>
                     <a class="button delete" href="/delete_product/{{ product.id }}">Delete</a>
                 </td>
