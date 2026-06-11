@@ -97,24 +97,24 @@
         <th>Action</th>
     </tr>
 
-    {% for item in items %}
+    {% for product in products %}
     <tr>
 
         <td>
-            {% if item.image %}
-                <img src="/static/uploads/products/{{ item.image }}">
+            {% if product.image %}
+                <img src="/static/uploads/products/{{ product.image }}">
             {% else %}
                 No Image
             {% endif %}
         </td>
 
-        <td>{{ item.name }}</td>
-        <td>{{ item.price }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>{{ item.subtotal }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.subtotal }}</td>
 
         <td>
-            <a class="btn remove" href="/cart/remove/{{ item.id }}">
+            <a class="btn remove" href="/cart/remove/{{ product.id }}">
                 Remove
             </a>
         </td>
