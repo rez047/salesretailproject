@@ -71,9 +71,17 @@
         <td class="status">{{ order.status }}</td>
 
         <td>
+
+        {% if order.status|lower == "delivered" %}
+            
             <a href="review/product/{{ order.product.id }}">
                 Review Product
             </a>
+
+        {% else %}
+
+            Waiting for Delivery
+        {% endif %}
         </td>
     </tr>
     {% endfor %}
