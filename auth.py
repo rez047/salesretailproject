@@ -108,7 +108,10 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        send_verification_email(user.email, user.verification_token)
+        if user.email and user.verification_token:
+            send_verification_email(user.email, user.verification_token)
+        else:
+            print("EMAIL NOT SENT -  missing data")
 
         return redirect(url_for("auth.login"))
 
