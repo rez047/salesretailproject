@@ -90,31 +90,31 @@
 <table>
     <tr>
         <th>Image</th>
-        <th>Product</th>
+        <th>item</th>
         <th>Price</th>
         <th>Qty</th>
         <th>Subtotal</th>
         <th>Action</th>
     </tr>
 
-    {% for product in products %}
+    {% for item in items %}
     <tr>
 
         <td>
-            {% if product.image %}
-                <img src="/static/uploads/products/{{ product.image }}">
+            {% if item.image %}
+                <img src="/static/uploads/items/{{ item.image }}">
             {% else %}
                 No Image
             {% endif %}
         </td>
 
-        <td>{{ product.name }}</td>
-        <td>{{ product.price }}</td>
-        <td>{{ product.quantity }}</td>
-        <td>{{ product.subtotal }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.price }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.subtotal }}</td>
 
         <td>
-            <a class="btn remove" href="/cart/remove/{{ product.id }}">
+            <a class="btn remove" href="/cart/remove/{{ item.id }}">
                 Remove
             </a>
         </td>
