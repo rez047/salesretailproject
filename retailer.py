@@ -9,20 +9,17 @@ retailer_bp = Blueprint("retailer", __name__)
 # =========================================================
 # RETAILER DASHBOARD (FIXED: orders via product ownership)
 # =========================================================
+
 @retailer_bp.route("/retailer/dashboard")
 @login_required
 def dashboard():
 
-    # Get all products owned by this retailer
-    products = Product.query.filter_by(
-        retailer_id=current_user.id
+    orders = Order.query.join(Product).filter(
+        Product.retailer_id == current_user.id
     ).all()
 
-    product_ids = [p.id for p in products]
-
-    # Get orders that belong to those products
-    orders = Order.query.filter(
-        Order.product_id.in_(product_ids)
+    products = Product.query.filter_by(
+        retailer_id=current_user.id
     ).all()
 
     return render_template(
