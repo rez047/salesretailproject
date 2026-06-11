@@ -1,5 +1,9 @@
 import os
-import resend
+from dotenv import load_dotenv
+from mailjet_rest import Client
+
+load_dotenv()
+
 
 # =========================
 # FILE UPLOAD HELPERS
@@ -14,39 +18,57 @@ def allowed_file(filename):
 
 
 # =========================
-# RESEND CONFIG
+# MAILJET CONFIG
 # =========================
-resend.api_key = os.getenv("RESEND_API_KEY")
+MAILJET_API_KEY = os.getenv("MAILJET_API_KEY")
+MAILJET_SECRET_KEY = os.getenv("MAILJET_SECRET_KEY")
+
+mailjet = Client(
+    auth=(MAILJET_API_KEY, MAILJET_SECRET_KEY),
+    version="v3.1"
+)
 
 
 # =========================
-# EMAIL FUNCTION (FIXED)
+# EMAIL FUNCTION (MAILJET)
 # =========================
 def send_verification_email(email, token):
 
-    verify_url = f"https://theemiratesretailstore8.onrender.com/verify/{token}"
+    verify_url = f"https://theemiratesretailstore777.onrender.com/verify/{token}"
+
+    data = {
+        "Messages": [
+            {
+                "From": {
+                    "Email": "no-reply@emiratesretailshop.com",
+                    "Name": "Emirates Retailshop"
+                },
+                "To": [
+                    {
+                        "Email": email,
+                        "Name": email
+                    }
+                ],
+                "Subject": "Verify your Emirates Retailshop account",
+                "HTMLPart": f"""
+                    <h2>Welcome to Emirates Retailshop</h2>
+                    <p>Please verify your account by clicking below:</p>
+                    <a href="{verify_url}">Verify Email</a>
+                """
+            }
+        ]
+    }
 
     try:
-        response = resend.Emails.send({
-            "from": "onboarding@resend.dev",
-            "to": email,
-            "subject": "Verify your email",
-            "html": f"""
-            <h2>Verify your account</h2>
-            <p>Click below to verify your account:</p>
-            <a href="{verify_url}">Verify Email</a>
-            """
-        })
+        result = mailjet.send.create(data=data)
 
-        print("EMAIL SENT SUCCESS:", response)
-        return response
+        print("MAILJET RESPONSE:", result.status_code, result.json())
+        return result.json()
 
     except Exception as e:
-        # IMPORTANT: prevents registration from breaking
-        print("EMAIL FAILED (NON-FATAL):", str(e))
+        print("MAILJET ERROR:", str(e))
         print("VERIFY LINK (MANUAL):", verify_url)
 
-        # still allow user to register
         return {
             "status": "failed",
             "error": str(e),
