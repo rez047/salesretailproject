@@ -113,7 +113,18 @@ class Chat(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    sender_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey("product.id"),
+        nullable=False
+    )
+
+    sender_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
 
     message = db.Column(db.Text, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=db.func.now())
