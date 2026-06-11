@@ -3,14 +3,14 @@
 Full-stack e-commerce platform built with Flask.
 
 ## Features
-- Multi-role authentication (Admin, Retailer, Buyer)
+- Multi-role authentication (Admin, StoreKeeper, Buyer)
 - Product management
 - Shopping cart
 - Orders system
 - Real-time chat (basic)
 - Ratings & reviews
 - Admin dashboard
-- Retailer dashboard
+- StoreKeeper dashboard
 
 ## Setup
 
