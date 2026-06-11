@@ -1,20 +1,14 @@
 from flask import Blueprint, redirect, url_for, render_template
 from flask_login import login_required, current_user
 
-from models import (
-    db,
-    Product,
-    CartItem,
-    Order
-)
+from models import db, Product, CartItem, Order
 
 cart = Blueprint("cart", __name__)
 
 
-# =====================================
-# ADD TO CART
-# =====================================
-
+# =========================
+# ADD TO CART (INCREASE QTY)
+# =========================
 @cart.route("/cart/add/<int:product_id>")
 @login_required
 def add_to_cart(product_id):
@@ -25,30 +19,23 @@ def add_to_cart(product_id):
     ).first()
 
     if item:
-
         item.quantity += 1
-
     else:
-
         item = CartItem(
             user_id=current_user.id,
             product_id=product_id,
             quantity=1
         )
-
         db.session.add(item)
 
     db.session.commit()
 
-    return redirect(
-        url_for("cart.view_cart")
-    )
+    return redirect(url_for("cart.view_cart"))
 
 
-# =====================================
-# VIEW CART
-# =====================================
-
+# =========================
+# VIEW CART (FULL FIXED)
+# =========================
 @cart.route("/cart")
 @login_required
 def view_cart():
@@ -58,20 +45,16 @@ def view_cart():
     ).all()
 
     cart_items = []
-
     total = 0
 
     for item in items:
 
-        product = Product.query.get(
-            item.product_id
-        )
+        product = Product.query.get(item.product_id)
 
         if not product:
             continue
 
         subtotal = product.price * item.quantity
-
         total += subtotal
 
         cart_items.append({
@@ -80,7 +63,8 @@ def view_cart():
             "name": product.name,
             "price": product.price,
             "quantity": item.quantity,
-            "subtotal": subtotal
+            "subtotal": subtotal,
+            "image": product.image
         })
 
     return render_template(
@@ -90,10 +74,9 @@ def view_cart():
     )
 
 
-# =====================================
+# =========================
 # REMOVE ITEM
-# =====================================
-
+# =========================
 @cart.route("/cart/remove/<int:item_id>")
 @login_required
 def remove_item(item_id):
@@ -101,20 +84,15 @@ def remove_item(item_id):
     item = CartItem.query.get(item_id)
 
     if item and item.user_id == current_user.id:
-
         db.session.delete(item)
-
         db.session.commit()
 
-    return redirect(
-        url_for("cart.view_cart")
-    )
+    return redirect(url_for("cart.view_cart"))
 
 
-# =====================================
-# CHECKOUT
-# =====================================
-
+# =========================
+# CHECKOUT (NO JS)
+# =========================
 @cart.route("/checkout", methods=["POST"])
 @login_required
 def checkout():
@@ -124,14 +102,11 @@ def checkout():
     ).all()
 
     if not cart_items:
-
         return "Cart is empty", 400
 
     for item in cart_items:
 
-        product = Product.query.get(
-            item.product_id
-        )
+        product = Product.query.get(item.product_id)
 
         if not product:
             continue
@@ -146,11 +121,8 @@ def checkout():
         )
 
         db.session.add(order)
-
         db.session.delete(item)
 
     db.session.commit()
 
-    return redirect(
-        url_for("buyer_dashboard")
-    )
+    return redirect(url_for("cart.view_cart"))
