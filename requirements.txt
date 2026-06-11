@@ -6,5 +6,3 @@ email-validator
 Werkzeug
 gunicorn
 python-dotenv
-resend
-mailjet-rest
