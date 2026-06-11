@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>StoreKeeper Dashboard</title>
+    <title>Retailer Dashboard</title>
 
     <style>
         body {
             font-family: Arial;
             background: #f4f6f9;
-            padding: 20px;
+            margin: 0;
         }
 
-        h1 {
+        header {
             background: #0b3d91;
             color: white;
             padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            padding: 20px;
         }
 
         table {
@@ -33,60 +38,66 @@
             color: white;
         }
 
-        select, button {
-            padding: 6px;
+        .card {
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>StoreKeeper Dashboard</h1>
+<header>
+    Storekeeper Dashboard
+</header>
 
-<h2>Incoming Orders</h2>
+<div class="container">
 
-<table>
-    <tr>
-        <th>Order ID</th>
-        <th>Customer</th>
-        <th>Email</th>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Total</th>
-        <th>Status</th>
-        <th>Update</th>
-    </tr>
+    <!-- ORDERS -->
+    <div class="card">
+        <h2>Incoming Orders</h2>
 
-    {% for order in orders %}
-    <tr>
-        <td>{{ order.id }}</td>
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Product</th>
+                <th>Buyer</th>
+                <th>Email</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Update</th>
+            </tr>
 
-        <td>{{ order.buyer.username }}</td>
-        <td>{{ order.buyer.email }}</td>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.product.name }}</td>
+                <td>{{ order.buyer.username }}</td>
+                <td>{{ order.buyer.email }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>{{ order.total_price }}</td>
+                <td>{{ order.status }}</td>
 
-        <td>{{ order.product.name }}</td>
-        <td>{{ order.product.price }}</td>
+                <td>
+                    <form method="POST" action="/retailer/order/{{ order.id }}/status">
+                        <select name="status">
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 
-        <td>{{ order.quantity }}</td>
-
-        <td>{{ order.total_price }}</td>
-        <td>{{ order.status }}</td>
-
-        <td>
-            <form method="POST" action="/retailer/order/{{ order.id }}/status">
-                <select name="status">
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                </select>
-                <button type="submit">Update</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+</div>
 
 </body>
 </html>
