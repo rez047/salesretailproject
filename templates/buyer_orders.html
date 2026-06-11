@@ -2,36 +2,91 @@
 <html>
 <head>
     <title>My Orders</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        header {
+            background: #0b3d91;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #0b3d91;
+            color: white;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
 
-<h2>My Order History</h2>
+<header>
+    My Orders
+</header>
 
-<a href="/buyer">← Back to Shop</a>
+<div class="container">
 
-<table border="1">
+<table>
     <tr>
         <th>Order ID</th>
         <th>Product</th>
-        <th>Price</th>
         <th>Quantity</th>
-        <th>Total</th>
+        <th>Total Price</th>
         <th>Status</th>
+        <th>Review</th>
     </tr>
 
     {% for order in orders %}
     <tr>
         <td>{{ order.id }}</td>
         <td>{{ order.product.name }}</td>
-        <td>{{ order.product.price }}</td>
         <td>{{ order.quantity }}</td>
         <td>{{ order.total_price }}</td>
-        <td>{{ order.status }}</td>
+        <td class="status">{{ order.status }}</td>
+
+        <td>
+            <button onclick="openReview({{ order.product.id }})">
+                Review Product
+            </button>
+        </td>
     </tr>
     {% endfor %}
 
 </table>
+
+</div>
+
+<script>
+function openReview(productId) {
+    window.location.href = "/buyer?review=" + productId;
+}
+</script>
 
 </body>
 </html>
