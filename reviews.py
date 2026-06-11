@@ -2,13 +2,13 @@ from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user
 from models import db, Review, Order
 
-reviews = Blueprint("reviews", __name__)
+reviews_bp = Blueprint("reviews", __name__)
 
 
 # =========================
-# REVIEW PAGE (optional UI route)
+# REVIEW PAGE (UI)
 # =========================
-@reviews_bp.route("/review/product/<int:product_id>", endpoint="review_page")
+@reviews_bp.route("/review/product/<int:product_id>")
 @login_required
 def review_page(product_id):
     return render_template("review_product.html", product_id=product_id)
@@ -17,14 +17,17 @@ def review_page(product_id):
 # =========================
 # ADD / UPDATE REVIEW (DELIVERED ONLY)
 # =========================
-@reviews.route("/review/add", methods=["POST"])
+@reviews_bp.route("/review/add", methods=["POST"])
 @login_required
 def add_review():
 
-    data = request.json
-    product_id = data["product_id"]
+    data = request.get_json()
+    product_id = data.get("product_id")
 
-    # verify delivered purchase
+    if not product_id:
+        return jsonify({"error": "Missing product_id"}), 400
+
+    # MUST BE DELIVERED PURCHASE
     order = Order.query.filter_by(
         user_id=current_user.id,
         product_id=product_id,
@@ -34,7 +37,7 @@ def add_review():
     if not order:
         return jsonify({"error": "Only delivered buyers can review"}), 403
 
-    # one review per user per product (update allowed)
+    # upsert review
     review = Review.query.filter_by(
         buyer_id=current_user.id,
         product_id=product_id
@@ -60,7 +63,7 @@ def add_review():
 # =========================
 # GET REVIEWS + AVERAGE
 # =========================
-@reviews.route("/review/<int:product_id>")
+@reviews_bp.route("/review/<int:product_id>")
 def get_reviews(product_id):
 
     reviews = Review.query.filter_by(product_id=product_id).all()
