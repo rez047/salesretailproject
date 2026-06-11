@@ -10,7 +10,18 @@ reviews = Blueprint("reviews", __name__)
 # =========================
 @reviews.route("/review/product/<int:product_id>")
 @login_required
+@reviews.route("/review/product/<int:product_id>")
+@login_required
 def review_page(product_id):
+
+    order = Order.query.filter_by(
+        user_id=current_user.id,
+        product_id=product_id,
+        status="delivered"
+    ).first()
+
+    if not order:
+        return "Only buyers with delivered orders can review this product", 403
 
     return render_template(
         "review_product.html",
