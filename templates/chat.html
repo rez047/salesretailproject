@@ -1,24 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+  <title>Chat System</title>
 </head>
 
 <body>
 
-<header>
-  <h1>Chat System</h1>
-</header>
+<h2>Chat</h2>
 
-<div class="container">
-  <input id="msg" placeholder="Type message">
-  <button onclick="send()">Send</button>
+<input id="receiver" placeholder="Receiver ID">
+<br><br>
 
-  <div id="chatBox"></div>
-</div>
+<input id="msg" placeholder="Message">
+<button onclick="send()">Send</button>
 
-<script src="/static/js/chat.js"></script>
+<div id="chatBox"></div>
+
+<script>
+function send() {
+    fetch("/chat/send", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            receiver_id: document.getElementById("receiver").value,
+            message: document.getElementById("msg").value
+        })
+    }).then(() => loadChat());
+}
+
+function loadChat() {
+    let id = document.getElementById("receiver").value;
+
+    fetch("/chat/" + id)
+    .then(res => res.json())
+    .then(data => {
+        let box = document.getElementById("chatBox");
+        box.innerHTML = "";
+
+        data.forEach(m => {
+            box.innerHTML += `<p><b>${m.from}:</b> ${m.msg}</p>`;
+        });
+    });
+}
+</script>
 
 </body>
 </html>
