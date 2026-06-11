@@ -18,6 +18,8 @@ from retailer import retailer_bp
 
 from security import role_required
 
+from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 
