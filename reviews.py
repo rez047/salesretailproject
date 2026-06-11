@@ -8,7 +8,7 @@ reviews = Blueprint("reviews", __name__)
 # =========================
 # ADD REVIEW (VERIFIED BUYER ONLY)
 # =========================
-@reviews.route("/review/product/<int:product_id>")
+@reviews.route("/buyer/review/product/<int:product_id>")
 @login_required
 def review_product_page(product_id):
 
