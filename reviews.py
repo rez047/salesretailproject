@@ -1,42 +1,37 @@
-from flask import Blueprint, request, jsonify
-from flask_login import login_required, current_user
-from models import db, Review
-from utils import allowed_file
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Orders</title>
+</head>
 
-reviews = Blueprint("reviews", __name__)
+<body>
 
-# --------------------
-# ADD REVIEW
-# --------------------
-@reviews.route("/review/add", methods=["POST"])
-@login_required
-def add_review():
-    data = request.json
+<h2>My Order History</h2>
 
-    review = Review(
-        buyer_id=current_user.id,
-        product_id=data["product_id"],
-        rating=data["rating"],
-        comment=data["comment"]
-    )
+<a href="/buyer">← Back to Shop</a>
 
-    db.session.add(review)
-    db.session.commit()
+<table border="1">
+    <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Total</th>
+        <th>Status</th>
+    </tr>
 
-    return jsonify({"message": "review added"})
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.product.name }}</td>
+        <td>{{ order.product.price }}</td>
+        <td>{{ order.quantity }}</td>
+        <td>{{ order.total_price }}</td>
+        <td>{{ order.status }}</td>
+    </tr>
+    {% endfor %}
 
+</table>
 
-# --------------------
-# GET REVIEWS FOR PRODUCT
-# --------------------
-@reviews.route("/review/<int:product_id>")
-def get_reviews(product_id):
-    reviews = Review.query.filter_by(product_id=product_id).all()
-
-    return jsonify([
-        {
-            "rating": r.rating,
-            "comment": r.comment
-        }
-        for r in reviews
-    ])
+</body>
+</html>
