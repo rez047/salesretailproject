@@ -34,7 +34,7 @@ mailjet = Client(
 # =========================
 def send_verification_email(email, token):
 
-    verify_url = f"https://theemiratesretailstore777.onrender.com/verify/{token}"
+    verify_url = f"https://theemiratesretailstore88.onrender.com/verify/{token}"
 
     data = {
         "Messages": [
@@ -49,9 +49,9 @@ def send_verification_email(email, token):
                         "Name": email
                     }
                 ],
-                "Subject": "Verify your Emirates Retailshop account",
+                "Subject": "Verify your Retailshop account",
                 "HTMLPart": f"""
-                    <h2>Welcome to Emirates Retailshop</h2>
+                    <h2>Welcome to Retailshop</h2>
                     <p>Please verify your account by clicking below:</p>
                     <a href="{verify_url}">Verify Email</a>
                 """
