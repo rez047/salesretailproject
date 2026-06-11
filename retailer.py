@@ -7,18 +7,20 @@ retailer_bp = Blueprint("retailer", __name__)
 
 
 # =====================================
-# RETAILER DASHBOARD (FIXED)
+# RETAILER DASHBOARD (FIXED WORKING QUERY)
 # =====================================
 @retailer_bp.route("/retailer/dashboard")
 @login_required
 def dashboard():
 
-    # GET ORDERS THROUGH PRODUCT RELATION (CORRECT WAY)
-    orders = Order.query.join(Product).filter(
-        Product.retailer_id == current_user.id
-    ).all()
+    # 🔥 CRITICAL FIX: join through Product
+    orders = (
+        db.session.query(Order)
+        .join(Product, Order.product_id == Product.id)
+        .filter(Product.retailer_id == current_user.id)
+        .all()
+    )
 
-    # GET ONLY THIS RETAILER PRODUCTS
     products = Product.query.filter_by(
         retailer_id=current_user.id
     ).all()
@@ -31,7 +33,7 @@ def dashboard():
 
 
 # =====================================
-# UPDATE ORDER STATUS (FIXED SECURITY)
+# UPDATE ORDER STATUS (SAFE)
 # =====================================
 @retailer_bp.route("/retailer/order/<int:order_id>/status", methods=["POST"])
 @login_required
@@ -42,7 +44,7 @@ def update_status(order_id):
     if not order:
         return "Order not found", 404
 
-    # SECURITY: ensure retailer owns this product
+    # 🔥 SECURITY CHECK
     if order.product.retailer_id != current_user.id:
         return "Unauthorized", 403
 
@@ -51,20 +53,3 @@ def update_status(order_id):
     db.session.commit()
 
     return redirect(url_for("retailer.dashboard"))
-
-
-# =====================================
-# RETAILER PRODUCTS
-# =====================================
-@retailer_bp.route("/retailer/products")
-@login_required
-def products():
-
-    products = Product.query.filter_by(
-        retailer_id=current_user.id
-    ).all()
-
-    return render_template(
-        "retailer_products.html",
-        products=products
-    )
