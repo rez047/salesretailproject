@@ -19,26 +19,17 @@ qa = Blueprint(
     "/product/<int:product_id>/question",
     methods=["POST"]
 )
+@market.route("/product/<int:product_id>/question", methods=["POST"])
 @login_required
 def ask_question(product_id):
-
-    data=request.json
-
-
-    q=ProductQuestion(
+    q = Question(
         product_id=product_id,
-        buyer_id=current_user.id,
-        question=data["question"]
+        user_id=current_user.id,
+        question=request.json["question"]
     )
-
-
     db.session.add(q)
     db.session.commit()
-
-
-    return jsonify(
-        {"message":"Question posted"}
-    )
+    return jsonify({"msg":"sent"})
 
 
 
