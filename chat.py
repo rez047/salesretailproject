@@ -13,19 +13,17 @@ chat = Blueprint("chat", __name__)
 @login_required
 def send_message():
 
-    data = request.json
-
     msg = Chat(
         sender_id=current_user.id,
-        receiver_id=data.get("receiver_id", 1),
-        product_id=data["product_id"],
-        message=data["message"]
+        receiver_id=request.json.get("receiver_id"),
+        product_id=request.json.get("product_id"),
+        message=request.json["message"]
     )
 
     db.session.add(msg)
     db.session.commit()
 
-    return jsonify({"message": "sent"})
+    return jsonify({"msg":"sent"})
 
 
 # =========================
