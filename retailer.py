@@ -40,16 +40,27 @@ def update_status(order_id):
     if not order:
         return "Order not found", 404
 
-    # ❌ REMOVE WRONG OWNERSHIP CHECK
-
-    # OPTIONAL: only allow retailer role users
     if current_user.role != "retailer":
         return "Unauthorized", 403
 
-    status = request.form.get("status","").lower()
+    status = request.form.get("status", "").lower()
 
-    if status not in ["pending", "processing", "shipped", "delivered"]:
+    valid = ["pending", "processing", "shipped", "delivered"]
+
+    if status not in valid:
         return "Invalid status", 400
+
+    # =========================
+    # STOCK REDUCTION LOGIC
+    # =========================
+    if order.status != "delivered" and status == "delivered":
+
+        product = Product.query.get(order.product_id)
+
+        if product and product.stock >= order.quantity:
+            product.stock -= order.quantity
+        elif product:
+            product.stock = 0  # safety fallback
 
     order.status = status
 
