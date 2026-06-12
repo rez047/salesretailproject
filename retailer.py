@@ -81,3 +81,16 @@ def update_status(order_id):
     db.session.commit()
 
     return redirect(url_for("retailer.dashboard"))
+
+
+@retailer_bp.route("/question/<int:id>/answer", methods=["POST"])
+@login_required
+def answer_question(id):
+
+    q = Question.query.get(id)
+    q.answer = request.json["answer"]
+
+    db.session.commit()
+
+    return jsonify({"msg": "answered"})
+
