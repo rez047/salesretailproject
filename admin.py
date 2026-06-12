@@ -83,7 +83,6 @@ def approve_user(id):
     if user.role == "admin":
         return redirect("/admin")
 
-    # Approve BOTH buyers and retailers
     user.approved = True
     user.is_verified = True
     user.is_active = True
