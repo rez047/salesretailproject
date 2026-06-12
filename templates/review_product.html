@@ -9,8 +9,10 @@
 <h2>Review Product</h2>
 
 
-<h3>Leave a Review</h3>
+<!-- REVIEW FORM (ONLY SHOWN IF ELIGIBLE) -->
+{% if can_review %}
 
+<h3>Leave a Review</h3>
 
 <select id="rating">
     <option value="5">★★★★★</option>
@@ -20,9 +22,7 @@
     <option value="1">★</option>
 </select>
 
-
 <br><br>
-
 
 <textarea
 id="comment"
@@ -31,39 +31,33 @@ cols="50"
 placeholder="Write your review">
 </textarea>
 
-
 <br><br>
-
 
 <button onclick="submitReview()">
 Submit Review
 </button>
 
+{% else %}
 
+<p style="color:red;">
+You can only review this product after it has been delivered.
+</p>
+
+{% endif %}
 
 <hr>
 
 
-<h2>
-Previous Reviews
-</h2>
-
+<h2>Previous Reviews</h2>
 
 <div id="reviews">
-
 Loading reviews...
-
 </div>
-
-
 
 <hr>
 
 
-<h2>
-Q & A
-</h2>
-
+<h2>Q & A</h2>
 
 <textarea
 id="question"
@@ -72,133 +66,72 @@ placeholder="Ask about this product">
 
 <br>
 
-<button>
+<button onclick="alert('Q&A feature coming soon')">
 Ask Question
 </button>
 
 
 
-
 <script>
-
 
 const product_id = {{ product_id }};
 
-
-
 function submitReview(){
 
+    fetch("/review/add", {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            product_id:product_id,
+            rating:document.getElementById("rating").value,
+            comment:document.getElementById("comment").value
+        })
+    })
 
-fetch("/review/add", {
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-
-body:JSON.stringify({
-
-product_id:product_id,
-
-rating:
-document.getElementById("rating").value,
-
-
-comment:
-document.getElementById("comment").value
-
-})
-
-
-})
-
-
-.then(res=>res.json())
-
-
-.then(data=>{
-
-
-alert(data.message || data.error);
-
-
-loadReviews();
-
-
-});
+    .then(res=>res.json())
+    .then(data=>{
+        alert(data.message || data.error);
+        loadReviews();
+    });
 
 }
-
-
-
 
 
 function loadReviews(){
 
+    fetch("/review/"+product_id)
+    .then(res=>res.json())
+    .then(data=>{
 
-fetch("/review/"+product_id)
+        let html="";
 
+        if(data.reviews.length===0){
+            html="No reviews yet";
+        }
 
-.then(res=>res.json())
+        data.reviews.forEach(r=>{
 
+            html += `
+            <div>
+                <h3>${"⭐".repeat(r.rating)}</h3>
+                <p>${r.comment}</p>
+                <hr>
+            </div>
+            `;
 
-.then(data=>{
+        });
 
+        document.getElementById("reviews").innerHTML=html;
 
-let html="";
-
-
-if(data.reviews.length===0){
-
-html="No reviews yet";
-
-}
-
-
-data.reviews.forEach(r=>{
-
-
-html += `
-
-<div>
-
-<h3>
-${"⭐".repeat(r.rating)}
-</h3>
-
-
-<p>
-${r.comment}
-</p>
-
-<hr>
-
-</div>
-
-`;
-
-
-});
-
-
-document.getElementById("reviews").innerHTML=html;
-
-
-
-});
-
+    });
 
 }
-
-
 
 loadReviews();
 
-
 </script>
-
 
 </body>
 </html>
