@@ -4,173 +4,109 @@
     <title>StoreKeeper Dashboard</title>
 
     <style>
-        body {
-            font-family: Arial;
-            margin: 0;
-            background: #f4f6f9;
-        }
+        body { font-family: Arial; margin:0; background:#f4f6f9; }
 
         header {
-            background: #0b3d91;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 20px;
+            background:#0b3d91;
+            color:white;
+            padding:15px;
+            text-align:center;
         }
 
         .topbar {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: #ddd;
-            align-items: center;
+            display:flex;
+            justify-content:space-between;
+            padding:10px 20px;
+            background:#ddd;
         }
 
-        .topbar a {
-            text-decoration: none;
-            margin-right: 10px;
-            color: #0b3d91;
-            font-weight: bold;
-        }
-
-        .container {
-            padding: 20px;
-        }
-
-        .section {
-            background: white;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
+        .container { padding:20px; }
 
         table {
-            width: 100%;
-            border-collapse: collapse;
+            width:100%;
+            border-collapse:collapse;
+            background:white;
         }
 
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
+        th, td {
+            padding:10px;
+            border:1px solid #ccc;
+            text-align:center;
         }
 
-        table th {
-            background: #0b3d91;
-            color: white;
+        th { background:#0b3d91; color:white; }
+
+        .btn {
+            padding:6px;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
         }
 
-        .img-thumb {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
-            transition: transform 0.3s ease;
+        .chat-box {
+            background:#fff;
+            padding:10px;
+            margin-top:20px;
+            border-radius:10px;
         }
 
-        .img-thumb:hover {
-            transform: scale(2.2);
-            position: relative;
-            z-index: 10;
-        }
-
-        .stock.green { color: green; font-weight: bold; }
-        .stock.yellow { color: orange; font-weight: bold; }
-        .stock.red { color: red; font-weight: bold; }
-        .stock.out { color: darkred; font-weight: bold; }
     </style>
 </head>
 
 <body>
 
-<header>
-    Retailer Dashboard
-</header>
+<header>StoreKeeper Dashboard</header>
 
 <div class="topbar">
     <div>
         <a href="/retailer/dashboard">Home</a>
+        <a href="/chat/inbox">Chat Inbox</a>
     </div>
-
     <a href="/logout">Logout</a>
 </div>
 
 <div class="container">
 
-    <!-- PRODUCTS -->
-    <div class="section">
-        <h2>Products</h2>
+<h2>Orders</h2>
 
-        <table>
-            <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Stock</th>
-            </tr>
+<table>
+<tr>
+    <th>ID</th>
+    <th>Buyer</th>
+    <th>Product</th>
+    <th>Qty</th>
+    <th>Status</th>
+    <th>Update</th>
+</tr>
 
-            {% for product in products %}
-            <tr>
-                <td>
-                    {% if product.image %}
-                        <img class="img-thumb" src="/static/uploads/products/{{ product.image }}">
-                    {% endif %}
-                </td>
+{% for order in orders %}
+<tr>
+    <td>{{ order.id }}</td>
+    <td>{{ order.buyer.username }}</td>
+    <td>{{ order.product.name }}</td>
+    <td>{{ order.quantity }}</td>
+    <td>{{ order.status }}</td>
+    <td>
+        <form method="POST" action="/retailer/order/{{ order.id }}/status">
+            <select name="status">
+                <option>pending</option>
+                <option>shipped</option>
+                <option>delivered</option>
+            </select>
+            <button class="btn">Update</button>
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
 
-                <td>{{ product.name }}</td>
-                <td>KSh {{ product.price }}</td>
+<!-- CHAT INBOX -->
+<div class="chat-box">
+    <h3>Product Questions / Chat Inbox</h3>
 
-                <td>
-                    {% if product.stock > 10 %}
-                        <span class="stock green">{{ product.stock }}</span>
-                    {% elif product.stock > 0 %}
-                        <span class="stock yellow">{{ product.stock }}</span>
-                    {% else %}
-                        <span class="stock out">OUT</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-
-    <!-- ORDERS -->
-    <div class="section">
-        <h2>Incoming Orders</h2>
-
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Qty</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.buyer.username }}</td>
-                <td>{{ order.product.name }}</td>
-                <td>{{ order.quantity }}</td>
-                <td>{{ order.status }}</td>
-                <td>
-                    <form method="POST" action="/retailer/order/{{ order.id }}/status">
-                        <select name="status">
-                            <option>pending</option>
-                            <option>processing</option>
-                            <option>shipped</option>
-                            <option>delivered</option>
-                        </select>
-                        <button>Update</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+    <p>Go to:</p>
+    <a href="/chat/inbox">Open Chat Inbox</a>
+</div>
 
 </div>
 
