@@ -1,56 +1,55 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required, current_user
 from models import db, Chat
-from utils import allowed_file
 
 chat = Blueprint("chat", __name__)
 
 
 # =========================
-# SEND MESSAGE (PRODUCT CHAT)
-# =========================
-@chat.route("/chat/send", methods=["POST"])
-@login_required
-def send_message():
-
-    msg = Chat(
-        sender_id=current_user.id,
-        receiver_id=request.json.get("receiver_id"),
-        product_id=request.json.get("product_id"),
-        message=request.json["message"]
-    )
-
-    db.session.add(msg)
-    db.session.commit()
-
-    return jsonify({"msg":"sent"})
-
-
-# =========================
-# LOAD PRODUCT CHAT
+# PRODUCT CHAT PAGE
 # =========================
 @chat.route("/chat/product/<int:product_id>")
 @login_required
-def get_chat(product_id):
+def product_chat_page(product_id):
+    return render_template("chat_product.html", product_id=product_id)
+
+
+# =========================
+# LOAD CHAT MESSAGES
+# =========================
+@chat.route("/chat/messages/<int:product_id>")
+@login_required
+def get_messages(product_id):
 
     messages = Chat.query.filter_by(product_id=product_id).all()
 
     return jsonify([
         {
             "from": m.sender_id,
+            "to": m.receiver_id,
             "msg": m.message
         }
         for m in messages
     ])
 
 
-@chat.route("/chat/product/<int:product_id>")
+# =========================
+# SEND MESSAGE
+# =========================
+@chat.route("/chat/send", methods=["POST"])
 @login_required
-def product_chat(product_id):
+def send_message():
 
-    messages = Chat.query.filter_by(product_id=product_id).all()
+    data = request.json
 
-    return jsonify([
-        {"from": m.sender_id, "msg": m.message}
-        for m in messages
-    ])
+    msg = Chat(
+        product_id=data.get("product_id"),
+        sender_id=current_user.id,
+        receiver_id=data.get("receiver_id"),
+        message=data["message"]
+    )
+
+    db.session.add(msg)
+    db.session.commit()
+
+    return jsonify({"status": "sent"})
