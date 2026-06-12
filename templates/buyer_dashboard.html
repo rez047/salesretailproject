@@ -1,133 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Buyer Dashboard</title>
+<title>Buyer Dashboard</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            margin: 0;
-            background: #f4f6f9;
-        }
+<style>
+body{font-family:Arial;background:#f4f6f9;margin:0;}
 
-        header {
-            background: #0b3d91;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
+.topbar{
+display:flex;justify-content:space-between;
+background:#ddd;padding:12px;
+}
 
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: #ddd;
-        }
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+padding:15px;
+}
 
-        .topbar a {
-            margin-right: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            color: #0b3d91;
-        }
+.card{
+background:white;padding:15px;border-radius:10px;
+}
 
-        .container { padding: 20px; }
+.img-wrap{
+width:100%;height:180px;overflow:hidden;border-radius:8px;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 15px;
-        }
+.img-wrap img{
+width:100%;height:100%;object-fit:cover;
+transition:0.3s;
+}
 
-        .card {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
+.img-wrap:hover img{
+transform:scale(1.4);
+}
 
-        .card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
+.btn{background:green;color:white;padding:6px;border:none;}
 
-        .stock-green { color: green; font-weight: bold; }
-        .stock-yellow { color: orange; font-weight: bold; }
-        .stock-red { color: red; font-weight: bold; }
+.stock{
+font-weight:bold;
+}
 
-        .btn {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 8px;
-            background: green;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        .btn-blue {
-            background: #0b3d91;
-        }
-
-        .btn-orange {
-            background: orange;
-        }
-    </style>
+.out{color:red;}
+.low{color:orange;}
+.good{color:green;}
+</style>
 </head>
 
 <body>
 
-<header>Buyer Dashboard</header>
-
 <div class="topbar">
-    <div>
-        <a href="/buyer">Home</a>
-        <a href="/chat/inbox">Chat</a>
-        <a href="/buyer/orders">My Orders</a>
-        <a href="/cart">Cart</a>
-    </div>
-
-    <a href="/logout">Logout</a>
+<div>
+<a href="/buyer">Home</a>
+<a href="/buyer/orders">My Orders</a>
+<a href="/cart">Cart</a>
+</div>
+<a href="/logout">Logout</a>
 </div>
 
-<div class="container">
 <div class="grid">
 
-{% for product in products %}
+{% for p in products %}
 <div class="card">
 
-    {% if product.image %}
-        <img src="/static/uploads/products/{{ product.image }}">
-    {% endif %}
+<div class="img-wrap">
+<img src="/static/uploads/products/{{p.image}}">
+</div>
 
-    <h3>{{ product.name }}</h3>
-    <p>Price: {{ product.price }}</p>
+<h3>{{p.name}}</h3>
 
-    <!-- STOCK COLOR -->
-    {% if product.stock > 10 %}
-        <p class="stock-green">In Stock ({{ product.stock }})</p>
-    {% elif product.stock > 0 %}
-        <p class="stock-yellow">Low Stock ({{ product.stock }})</p>
-    {% else %}
-        <p class="stock-red">Out of Stock</p>
-    {% endif %}
+<p>Price: {{p.price}}</p>
 
-    <a class="btn" href="/cart/add/{{ product.id }}">Add to Cart</a>
+<p class="stock
+{% if p.stock==0 %}out{% elif p.stock<=5 %}low{% else %}good{% endif %}
+">
+Stock: {{p.stock}}
+</p>
 
-    <a class="btn btn-blue" href="/review/product/{{ product.id }}">
-        Reviews & Q&A
-    </a>
+<a class="btn" href="/cart/add/{{p.id}}">
+Add to Cart
+</a>
 
-    <a class="btn btn-orange" href="/chat/{{ product.id }}">
-        Product Chat
-    </a>
+<a class="btn" href="/review/product/{{p.id}}">
+Reviews
+</a>
+
+<a class="btn" href="/chat/{{p.id}}">
+Q&A Chat
+</a>
 
 </div>
 {% endfor %}
 
-</div>
 </div>
 
 </body>
