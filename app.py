@@ -3,6 +3,7 @@ from flask import Flask, render_template
 from config import Config
 from extensions import db, login_manager
 from models import User, Product
+from auth import auth
 
 from admin import admin_bp
 from marketplace import market
