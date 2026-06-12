@@ -1,9 +1,7 @@
 import os
-
 from flask import Flask, render_template
 
 from config import Config
-
 from extensions import db, login_manager
 
 from models import User, Product
@@ -20,15 +18,17 @@ from qa import qa
 
 from security import role_required
 
-app = Flask(__name__)
 
+# ==============================
+# APP INITIALIZATION
+# ==============================
+app = Flask(__name__)
 app.config.from_object(Config)
 
 
 # ==============================
 # SESSION SETTINGS
 # ==============================
-
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="LAX",
@@ -37,13 +37,10 @@ app.config.update(
 
 
 # ==============================
-# EXTENSIONS
+# EXTENSIONS INIT
 # ==============================
-
 db.init_app(app)
-
 login_manager.init_app(app)
-
 login_manager.login_view = "auth.login"
 
 
@@ -53,10 +50,11 @@ def load_user(user_id):
 
 
 # ==============================
-# DATABASE INITIALIZATION
+# DATABASE INIT (SAFE)
 # ==============================
-
 def init_db():
+    """Safe DB initialization that runs inside app context."""
+
     db.create_all()
 
     admin_email = os.getenv("ADMIN_EMAIL")
@@ -75,116 +73,69 @@ def init_db():
         db.session.commit()
 
 
-
-# RUN DATABASE INIT WHEN GUNICORN STARTS
-def create_app():
-    with app.app_context():
-        init_db()
-    return app
-
-
-app = create_app()
-
-
-
 # ==============================
-# BLUEPRINTS
+# RUN INIT ON STARTUP (SAFE)
 # ==============================
-
-app.register_blueprint(auth)
-
-app.register_blueprint(admin_bp)
-
-app.register_blueprint(market)
-
-app.register_blueprint(cart)
-
-app.register_blueprint(chat)
-
-app.register_blueprint(reviews_bp)
-
-app.register_blueprint(retailer_bp)
-
-app.register_blueprint(buyer_orders)
-
-app.register_blueprint(qa)
-
-app.register_blueprint(url_prefix="")
-
-
 with app.app_context():
     init_db()
+
+
+# ==============================
+# BLUEPRINT REGISTRATION
+# ==============================
+app.register_blueprint(auth)
+app.register_blueprint(admin_bp)
+app.register_blueprint(market)
+app.register_blueprint(cart)
+app.register_blueprint(chat)
+app.register_blueprint(reviews_bp)
+app.register_blueprint(retailer_bp)
+app.register_blueprint(buyer_orders)
+app.register_blueprint(qa)
+
 
 # ==============================
 # PAGES
 # ==============================
-
-
 @app.route("/")
 def home():
-
     return render_template("login.html")
-
 
 
 @app.route("/login")
 def login_page():
-
     return render_template("login.html")
-
 
 
 @app.route("/register")
 def register_page():
-
     return render_template("register.html")
-
 
 
 @app.route("/products-page")
 def products_page():
-
     return render_template("products.html")
-
 
 
 @app.route("/checkout-page")
 def checkout_page():
-
     return render_template("checkout.html")
-
 
 
 @app.route("/buyer")
 def buyer_dashboard():
-
     products = Product.query.all()
-
-    return render_template(
-        "buyer_dashboard.html",
-        products=products
-    )
-
+    return render_template("buyer_dashboard.html", products=products)
 
 
 @app.route("/admin")
 @role_required("admin")
 def admin_dashboard():
-
-    return render_template(
-        "admin_dashboard.html"
-    )
-
+    return render_template("admin_dashboard.html")
 
 
 # ==============================
-# LOCAL DEVELOPMENT
+# MAIN ENTRY
 # ==============================
-
 if __name__ == "__main__":
-
-    app.run(
-        host="0.0.0.0",
-        port=5000,
-        debug=True
-    )
+    app.run(host="0.0.0.0", port=5000, debug=True)
