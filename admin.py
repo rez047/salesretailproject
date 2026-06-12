@@ -35,7 +35,7 @@ def role_required(role):
 # =========================
 # DASHBOARD
 # =========================
-@admin_bp.route("/admin")
+@admin_bp.route("/")
 @login_required
 @role_required("admin")
 def dashboard():
@@ -55,20 +55,6 @@ def dashboard():
 # =========================
 # USERS
 # =========================
-@admin_bp.route("/delete_user/<int:id>")
-@login_required
-@role_required("admin")
-def delete_user(id):
-
-    user = User.query.get(id)
-
-    if user:
-        db.session.delete(user)
-        db.session.commit()
-
-    return redirect("/admin")
-
-
 @admin_bp.route("/approve_user/<int:id>")
 @login_required
 @role_required("admin")
@@ -93,6 +79,18 @@ def approve_user(id):
     return redirect("/admin")
 
 
+@admin_bp.route("/delete_user/<int:id>")
+@login_required
+@role_required("admin")
+def delete_user(id):
+
+    user = User.query.get(id)
+
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+
+    return redirect("/admin")
 # =========================
 # PRODUCTS (WITH IMAGE UPLOAD)
 # =========================
