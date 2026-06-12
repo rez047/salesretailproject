@@ -57,36 +57,22 @@ def load_user(user_id):
 # ==============================
 
 def init_db():
+    db.create_all()
 
-    with app.app_context():
+    admin_email = os.getenv("ADMIN_EMAIL")
 
-        # Create tables
-        db.create_all()
+    if admin_email:
+        admin = User.query.filter_by(email=admin_email).first()
 
+        if admin:
+            admin.role = "admin"
+            admin.approved = True
+            admin.is_verified = True
+            admin.is_active = True
+        else:
+            create_admin()
 
-        # Create or upgrade admin
-        admin_email = os.getenv("ADMIN_EMAIL")
-
-        if admin_email:
-
-            admin = User.query.filter_by(
-                email=admin_email
-            ).first()
-
-
-            if admin:
-
-                admin.role = "admin"
-                admin.approved = True
-                admin.is_verified = True
-                admin.is_active = True
-
-                db.session.commit()
-
-
-            else:
-
-                create_admin()
+        db.session.commit()
 
 
 
@@ -123,9 +109,11 @@ app.register_blueprint(buyer_orders)
 
 app.register_blueprint(qa)
 
-app.register_blueprint(reviews, url_prefix="")
+app.register_blueprint(url_prefix="")
 
 
+with app.app_context():
+    init_db()
 
 # ==============================
 # PAGES
