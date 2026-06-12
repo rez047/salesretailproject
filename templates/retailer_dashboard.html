@@ -1,309 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
 <title>StoreKeeper Dashboard</title>
 
-<link rel="stylesheet" href="/static/css/style.css">
-
 <style>
-
-body{
-font-family:Arial;
-background:#f4f6f9;
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #f4f6f9;
 }
 
-header{
-background:#0b3d91;
-color:white;
-padding:20px;
-text-align:center;
+header {
+    background: #0b3d91;
+    color: white;
+    padding: 18px;
+    text-align: center;
+    font-size: 20px;
 }
 
-
-.topbar{
-background:white;
-padding:15px;
-display:flex;
-justify-content:space-between;
+/* TOPBAR */
+.topbar {
+    display:flex;
+    justify-content:space-between;
+    padding:12px 20px;
+    background:#ddd;
 }
 
-
-.container{
-padding:20px;
+.topbar a {
+    text-decoration:none;
+    margin-right:15px;
+    font-weight:bold;
+    color:#0b3d91;
 }
 
+/* TABLE */
+.container { padding:20px; }
 
-.card{
-background:white;
-padding:20px;
-border-radius:10px;
-margin-bottom:20px;
+table {
+    width:100%;
+    border-collapse: collapse;
+    background:white;
 }
 
-
-table{
-width:100%;
-border-collapse:collapse;
+th, td {
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
 }
 
-
-td,th{
-border:1px solid #ddd;
-padding:10px;
-text-align:center;
+th {
+    background:#0b3d91;
+    color:white;
 }
 
-
-th{
-background:#0b3d91;
-color:white;
+/* STOCK COLORS */
+.stock {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 5px;
+    display: inline-block;
 }
 
+.stock-good { background:#d4edda; color:#155724; }
+.stock-normal { background:#fff3cd; color:#856404; }
+.stock-low { background:#ffe5b4; color:#8a4b08; }
+.stock-out { background:#f8d7da; color:#721c24; }
 
-button,a{
-padding:7px;
-border-radius:5px;
-text-decoration:none;
+button {
+    padding:6px 10px;
+    background:green;
+    color:white;
+    border:none;
+    border-radius:5px;
 }
-
-
-.update{
-background:green;
-color:white;
-}
-
-
-.chat{
-background:#ff9800;
-color:white;
-}
-
-
 </style>
-
 </head>
-
 
 <body>
 
-
-<header>
-
-Storekeeper Dashboard
-
-</header>
-
-
+<header>StoreKeeper Dashboard</header>
 
 <div class="topbar">
-
-<div>
-
-<a href="/retailer/dashboard">
-Home
-</a>
-
-
-<a href="/products-page">
-Products
-</a>
-
-
+    <div>
+        <a href="/retailer/dashboard">Home</a>
+    </div>
+    <a href="/logout">Logout</a>
 </div>
-
-
-<a href="/logout">
-Logout
-</a>
-
-
-</div>
-
-
 
 <div class="container">
 
-
-
-<div class="card">
-
-
-<h2>Orders</h2>
-
+<h2>Incoming Orders</h2>
 
 <table>
-
-
 <tr>
-
-<th>ID</th>
-<th>Buyer</th>
-<th>Product</th>
-<th>Total</th>
-<th>Status</th>
-<th>Update</th>
-
+    <th>ID</th>
+    <th>Customer</th>
+    <th>Email</th>
+    <th>Product</th>
+    <th>Stock Info</th>
+    <th>Quantity</th>
+    <th>Status</th>
+    <th>Update</th>
 </tr>
-
-
 
 {% for order in orders %}
-
-
 <tr>
+    <td>{{ order.id }}</td>
+    <td>{{ order.buyer.username }}</td>
+    <td>{{ order.buyer.email }}</td>
+    <td>{{ order.product.name }}</td>
 
+    <!-- STOCK STATUS -->
+    <td>
+        {% set s = order.product.stock %}
+        {% if s == 0 %}
+            <span class="stock stock-out">Out</span>
+        {% elif s <= 5 %}
+            <span class="stock stock-low">{{ s }}</span>
+        {% elif s <= 20 %}
+            <span class="stock stock-normal">{{ s }}</span>
+        {% else %}
+            <span class="stock stock-good">{{ s }}</span>
+        {% endif %}
+    </td>
 
-<td>{{order.id}}</td>
+    <td>{{ order.quantity }}</td>
+    <td>{{ order.status }}</td>
 
-
-<td>
-{{order.buyer.username}}
-</td>
-
-
-<td>
-{{order.product.name}}
-</td>
-
-
-<td>
-{{order.total_price}}
-</td>
-
-
-
-<td>
-{{order.status}}
-</td>
-
-
-<td>
-
-
-<form method="POST"
-action="/retailer/order/{{order.id}}/status">
-
-
-<select name="status">
-
-<option>pending</option>
-<option>processing</option>
-<option>shipped</option>
-<option>delivered</option>
-
-
-</select>
-
-
-<button class="update">
-Update
-</button>
-
-
-</form>
-
-
-</td>
-
-
+    <td>
+        <form method="POST" action="/retailer/order/{{ order.id }}/status">
+            <select name="status">
+                <option>pending</option>
+                <option>processing</option>
+                <option>shipped</option>
+                <option>delivered</option>
+            </select>
+            <button type="submit">Update</button>
+        </form>
+    </td>
 </tr>
-
-
 {% endfor %}
-
 
 </table>
 
-
 </div>
-
-
-
-
-
-
-<div class="card">
-
-<h2>
-Product Reviews & Questions
-</h2>
-
-
-{% for product in products %}
-
-
-<h3>
-{{product.name}}
-</h3>
-
-
-<div id="reviews-{{product.id}}">
-
-Loading reviews...
-
-</div>
-
-
-<a class="chat"
-href="/chat/{{product.id}}">
-Open Product Chat
-</a>
-
-
-<hr>
-
-
-{% endfor %}
-
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-<script>
-
-
-{% for product in products %}
-
-
-fetch("/review/{{product.id}}")
-.then(r=>r.json())
-.then(data=>{
-
-
-document.getElementById(
-"reviews-{{product.id}}"
-).innerHTML=
-
-
-"⭐ Average: "
-+data.average
-+"<br>"
-+data.reviews.map(
-x=>x.comment
-).join("<br>");
-
-
-
-});
-
-
-
-{% endfor %}
-
-
-
-</script>
-
-
 
 </body>
 </html>
