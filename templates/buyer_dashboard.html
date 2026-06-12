@@ -1,159 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Buyer Dashboard</title>
+    <title>Buyer Dashboard</title>
 
-<style>
-body {
-    font-family: Arial;
-    margin: 0;
-    background: #f4f6f9;
-}
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f6f9;
+        }
 
-/* HEADER */
-header {
-    background: #0b3d91;
-    color: white;
-    padding: 18px;
-    text-align: center;
-    font-size: 20px;
-}
+        header {
+            background: #0b3d91;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+        }
 
-/* TOPBAR */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: #ddd;
-}
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: #ddd;
+            align-items: center;
+        }
 
-.topbar a {
-    text-decoration: none;
-    margin-right: 15px;
-    font-weight: bold;
-    color: #0b3d91;
-}
+        .topbar a {
+            text-decoration: none;
+            margin-right: 10px;
+            color: #0b3d91;
+            font-weight: bold;
+        }
 
-/* GRID */
-.container { padding: 20px; }
+        .container {
+            padding: 20px;
+        }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 15px;
-}
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+        }
 
-/* CARD */
-.card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
 
-/* IMAGE */
-.card img {
-    width: 100%;
-    height: 170px;
-    object-fit: cover;
-    border-radius: 8px;
-}
+        .card img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
 
-/* BUTTONS */
-.btn {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 8px 10px;
-    background: green;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-}
+        .card img:hover {
+            transform: scale(1.08);
+        }
 
-/* STOCK COLORS */
-.stock {
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 5px;
-    display: inline-block;
-}
+        .price {
+            font-weight: bold;
+            margin-top: 5px;
+        }
 
-.stock-good { background:#d4edda; color:#155724; }
-.stock-normal { background:#fff3cd; color:#856404; }
-.stock-low { background:#ffe5b4; color:#8a4b08; }
-.stock-out { background:#f8d7da; color:#721c24; }
+        .stock {
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
 
-.qty {
-    width: 60px;
-    padding: 5px;
-    margin-top: 5px;
-}
-</style>
+        .stock.green { color: green; }
+        .stock.yellow { color: orange; }
+        .stock.red { color: red; }
+        .stock.out { color: darkred; font-weight: bold; }
+
+        .btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: green;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .btn.secondary {
+            background: #0b3d91;
+        }
+    </style>
 </head>
 
 <body>
 
-<header>Buyer Dashboard - Shop Products</header>
+<header>
+    Buyer Dashboard - Shop Products
+</header>
 
 <div class="topbar">
     <div>
         <a href="/buyer">Home</a>
         <a href="/buyer/orders">My Orders</a>
-        <a href="/cart">View Cart</a>
+        <a href="/cart">Cart</a>
     </div>
+
     <a href="/logout">Logout</a>
 </div>
 
 <div class="container">
 
-<div class="grid">
+    <div class="grid">
 
-{% for product in products %}
-<div class="card">
+        {% for product in products %}
 
-    {% if product.image %}
-        <img src="/static/uploads/products/{{ product.image }}">
-    {% else %}
-        <img src="/static/uploads/products/default.png">
-    {% endif %}
+        <div class="card">
 
-    <h3>{{ product.name }}</h3>
+            {% if product.image %}
+                <img src="/static/uploads/products/{{ product.image }}">
+            {% else %}
+                <img src="/static/uploads/products/default.png">
+            {% endif %}
 
-    <p>Price: {{ product.price }}</p>
+            <h3>{{ product.name }}</h3>
 
-    <!-- STOCK STATUS -->
-    <p>
-        {% if product.stock == 0 %}
-            <span class="stock stock-out">Out of Stock</span>
-        {% elif product.stock <= 5 %}
-            <span class="stock stock-low">{{ product.stock }} Low</span>
-        {% elif product.stock <= 20 %}
-            <span class="stock stock-normal">{{ product.stock }}</span>
-        {% else %}
-            <span class="stock stock-good">{{ product.stock }}</span>
-        {% endif %}
-    </p>
+            <div class="price">KSh {{ product.price }}</div>
 
-    <!-- QUANTITY (UI ONLY) -->
-    <input class="qty" type="number" min="1" value="1">
+            <!-- STOCK COLORS -->
+            {% if product.stock > 10 %}
+                <div class="stock green">In Stock ({{ product.stock }})</div>
+            {% elif product.stock > 0 %}
+                <div class="stock yellow">Low Stock ({{ product.stock }})</div>
+            {% else %}
+                <div class="stock out">Out of Stock</div>
+            {% endif %}
 
-    {% if product.stock > 0 %}
-        <a class="btn" href="/cart/add/{{ product.id }}">Add to Cart</a>
-    {% else %}
-        <button class="btn" style="background:gray;" disabled>Out of Stock</button>
-    {% endif %}
+            <a class="btn" href="/cart/add/{{ product.id }}">
+                Add to Cart
+            </a>
 
-    <a class="btn" href="/review/product/{{ product.id }}">
-        ⭐ Reviews & Q&A
-    </a>
+            <a class="btn secondary" href="/review/product/{{ product.id }}">
+                ⭐ Reviews & Q&A
+            </a>
 
-</div>
-{% endfor %}
+        </div>
 
-</div>
+        {% endfor %}
+
+    </div>
 
 </div>
 
