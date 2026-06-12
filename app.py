@@ -1,19 +1,9 @@
 import os
 from flask import Flask, render_template
+
 from config import Config
 from extensions import db, login_manager
 from models import User, Product
-from auth import auth
-
-from admin import admin_bp
-from marketplace import market
-from cart import cart
-from chat import chat
-from reviews import reviews_bp
-from retailer import retailer_bp
-from buyer_orders import buyer_orders
-from qa import qa
-from seed import create_admin
 
 from security import role_required
 
@@ -23,14 +13,18 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # session safety
+    # ==============================
+    # SESSION SECURITY
+    # ==============================
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="LAX",
         SESSION_COOKIE_SECURE=False
     )
 
-    # init extensions
+    # ==============================
+    # EXTENSIONS INIT
+    # ==============================
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
@@ -39,12 +33,30 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # init DB safely
+    # ==============================
+    # SAFE DB INIT
+    # ==============================
     with app.app_context():
         db.create_all()
+
+        # Import here to avoid circular imports
+        from seed import create_admin
         create_admin()
 
-    # register blueprints
+    # ==============================
+    # BLUEPRINTS (IMPORT INSIDE FUNCTION)
+    # ==============================
+
+    from auth import auth
+    from admin import admin_bp
+    from marketplace import market
+    from cart import cart
+    from chat import chat
+    from reviews import reviews_bp
+    from retailer import retailer_bp
+    from buyer_orders import buyer_orders
+    from qa import qa
+
     app.register_blueprint(auth)
     app.register_blueprint(admin_bp)
     app.register_blueprint(market)
@@ -55,7 +67,10 @@ def create_app():
     app.register_blueprint(buyer_orders)
     app.register_blueprint(qa)
 
-    # pages
+    # ==============================
+    # PAGES
+    # ==============================
+
     @app.route("/")
     def home():
         return render_template("login.html")
@@ -70,10 +85,25 @@ def create_app():
     def admin_dashboard():
         return render_template("admin_dashboard.html")
 
+    @app.route("/products-page")
+    def products_page():
+        return render_template("products.html")
+
+    @app.route("/checkout-page")
+    def checkout_page():
+        return render_template("checkout.html")
+
     return app
 
 
+# ==============================
+# RUN APP
+# ==============================
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
