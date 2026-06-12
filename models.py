@@ -98,17 +98,28 @@ class Review(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    buyer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
+    buyer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey("product.id"),
+        nullable=False
+    )
 
     rating = db.Column(db.Integer, nullable=False)
+
     comment = db.Column(db.Text)
 
-    created_at = db.Column(db.DateTime, default=db.func.now())
+    reply = db.Column(db.Text, nullable=True)
 
-    # prevents duplicate reviews per user per product
-    __table_args__ = (
-        db.UniqueConstraint('buyer_id', 'product_id', name='unique_user_product_review'),
+    replied_by = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=True
     )
 
 
@@ -118,33 +129,37 @@ class Review(db.Model):
 
 class Chat(db.Model):
 
-    __tablename__ = "chat"
+    __tablename__="chat"
 
-    id = db.Column(
+    id=db.Column(
         db.Integer,
         primary_key=True
     )
 
-    sender_id = db.Column(
+    product_id=db.Column(
+        db.Integer,
+        db.ForeignKey("product.id"),
+        nullable=True
+    )
+
+
+    sender_id=db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
     )
 
-    receiver_id = db.Column(
+
+    receiver_id=db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
     )
 
-    message = db.Column(
+
+    message=db.Column(
         db.Text,
         nullable=False
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        server_default=db.func.now()
     )
 
 
