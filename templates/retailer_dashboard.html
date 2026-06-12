@@ -1,69 +1,309 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>StoreKeeper Dashboard</title>
+
+<title>StoreKeeper Dashboard</title>
+
+<link rel="stylesheet" href="/static/css/style.css">
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+}
+
+header{
+background:#0b3d91;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+
+.topbar{
+background:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+}
+
+
+.container{
+padding:20px;
+}
+
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+
+td,th{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+
+th{
+background:#0b3d91;
+color:white;
+}
+
+
+button,a{
+padding:7px;
+border-radius:5px;
+text-decoration:none;
+}
+
+
+.update{
+background:green;
+color:white;
+}
+
+
+.chat{
+background:#ff9800;
+color:white;
+}
+
+
+</style>
+
 </head>
-
-<div class="topbar">
-    <div>
-        <a href="/retailer">Home</a>
-        
-    </div>
-
-    <a href="/logout">Logout</a>
-</div>
 
 
 <body>
 
-<h1>StoreKeeper Dashboard</h1>
 
-<h2>Incoming Orders</h2>
+<header>
 
-<table border="1">
-    <tr>
-        <th>Order ID</th>
-        <th>Customer</th>
-        <th>Email</th>
-        <th>Product</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Total</th>
-        <th>Status</th>
-        <th>Update</th>
-    </tr>
+Storekeeper Dashboard
 
-    {% for order in orders %}
-    <tr>
-        <td>{{ order.id }}</td>
+</header>
 
-        <td>{{ order.buyer.username }}</td>
-        <td>{{ order.buyer.email }}</td>
 
-        <td>{{ order.product.name }}</td>
-        <td>{{ order.product.price }}</td>
 
-        <td>{{ order.quantity }}</td>
+<div class="topbar">
 
-        <td>{{ order.quantity * order.product.price }}</td>
+<div>
 
-        <td>{{ order.status }}</td>
+<a href="/retailer/dashboard">
+Home
+</a>
 
-        <td>
-            <form method="POST" action="/retailer/order/{{ order.id }}/status">
-                <select name="status">
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                </select>
-                <button type="submit">Update</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+
+<a href="/products-page">
+Products
+</a>
+
+
+</div>
+
+
+<a href="/logout">
+Logout
+</a>
+
+
+</div>
+
+
+
+<div class="container">
+
+
+
+<div class="card">
+
+
+<h2>Orders</h2>
+
+
+<table>
+
+
+<tr>
+
+<th>ID</th>
+<th>Buyer</th>
+<th>Product</th>
+<th>Total</th>
+<th>Status</th>
+<th>Update</th>
+
+</tr>
+
+
+
+{% for order in orders %}
+
+
+<tr>
+
+
+<td>{{order.id}}</td>
+
+
+<td>
+{{order.buyer.username}}
+</td>
+
+
+<td>
+{{order.product.name}}
+</td>
+
+
+<td>
+{{order.total_price}}
+</td>
+
+
+
+<td>
+{{order.status}}
+</td>
+
+
+<td>
+
+
+<form method="POST"
+action="/retailer/order/{{order.id}}/status">
+
+
+<select name="status">
+
+<option>pending</option>
+<option>processing</option>
+<option>shipped</option>
+<option>delivered</option>
+
+
+</select>
+
+
+<button class="update">
+Update
+</button>
+
+
+</form>
+
+
+</td>
+
+
+</tr>
+
+
+{% endfor %}
+
 
 </table>
+
+
+</div>
+
+
+
+
+
+
+<div class="card">
+
+<h2>
+Product Reviews & Questions
+</h2>
+
+
+{% for product in products %}
+
+
+<h3>
+{{product.name}}
+</h3>
+
+
+<div id="reviews-{{product.id}}">
+
+Loading reviews...
+
+</div>
+
+
+<a class="chat"
+href="/chat/{{product.id}}">
+Open Product Chat
+</a>
+
+
+<hr>
+
+
+{% endfor %}
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+<script>
+
+
+{% for product in products %}
+
+
+fetch("/review/{{product.id}}")
+.then(r=>r.json())
+.then(data=>{
+
+
+document.getElementById(
+"reviews-{{product.id}}"
+).innerHTML=
+
+
+"⭐ Average: "
++data.average
++"<br>"
++data.reviews.map(
+x=>x.comment
+).join("<br>");
+
+
+
+});
+
+
+
+{% endfor %}
+
+
+
+</script>
+
+
 
 </body>
 </html>
