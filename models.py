@@ -219,9 +219,12 @@ class ProductQuestion(db.Model):
  
 
 class Question(db.Model):
+    __tablename__ = "question"
+
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey("product.id"))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+
     question = db.Column(db.Text)
     answer = db.Column(db.Text, nullable=True)
 
