@@ -16,6 +16,7 @@ from chat import chat
 from reviews import reviews_bp
 from retailer import retailer_bp
 from buyer_orders import buyer_orders
+from qa import qa
 
 from security import role_required
 
@@ -114,6 +115,8 @@ app.register_blueprint(reviews_bp)
 app.register_blueprint(retailer_bp)
 
 app.register_blueprint(buyer_orders)
+
+app.register_blueprint(qa)
 
 
 
