@@ -51,6 +51,9 @@ class Product(db.Model):
 
     retailer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
+    avg_rating = db.Column(db.Float, default=0)
+    rating_count = db.Column(db.Integer, default=0)
+    
     # RELATIONSHIP
     orders = db.relationship("Order", backref="product", lazy=True)
 
