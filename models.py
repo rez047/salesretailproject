@@ -113,17 +113,16 @@ class Review(db.Model):
 
 
 # ===================================
-# CHAT MODEL
+# PRIVATE CHAT
 # ===================================
+
 class Chat(db.Model):
+
     __tablename__ = "chat"
 
-    id = db.Column(db.Integer, primary_key=True)
-
-    product_id = db.Column(
+    id = db.Column(
         db.Integer,
-        db.ForeignKey("product.id"),
-        nullable=False
+        primary_key=True
     )
 
     sender_id = db.Column(
@@ -132,6 +131,74 @@ class Chat(db.Model):
         nullable=False
     )
 
-    message = db.Column(db.Text, nullable=False)
+    receiver_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
 
-    created_at = db.Column(db.DateTime, default=db.func.now())
+    message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+
+# ===================================
+# PRODUCT QUESTIONS & ANSWERS
+# ===================================
+
+class ProductQuestion(db.Model):
+
+    __tablename__ = "product_question"
+
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey("product.id"),
+        nullable=False
+    )
+
+
+    buyer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+
+    question = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+
+    answer = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+
+    answered_by = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=True
+    )
+
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+ 
