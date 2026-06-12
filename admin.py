@@ -10,7 +10,7 @@ from extensions import db
 from utils import allowed_file
 
 
-admin_bp = Blueprint("admin", __name__)
+admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 UPLOAD_FOLDER = "static/uploads/products"
