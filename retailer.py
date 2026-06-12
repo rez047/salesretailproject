@@ -43,12 +43,26 @@ def update_status(order_id):
     if current_user.role != "retailer":
         return "Unauthorized", 403
 
-    status = request.form.get("status", "").lower()
+    new_status = request.form.get("status","").lower()
 
-    valid = ["pending", "processing", "shipped", "delivered"]
-
-    if status not in valid:
+    if new_status not in ["pending", "processing", "shipped", "delivered"]:
         return "Invalid status", 400
+
+    # ✅ STOCK DEDUCTION ONLY ON FIRST DELIVERY
+    if order.status != "delivered" and new_status == "delivered":
+
+        product = Product.query.get(order.product_id)
+
+        if product and product.stock >= order.quantity:
+            product.stock -= order.quantity
+        else:
+            return "Not enough stock", 400
+
+    order.status = new_status
+
+    db.session.commit()
+
+    return redirect(url_for("retailer.dashboard"))
 
     # =========================
     # STOCK REDUCTION LOGIC
