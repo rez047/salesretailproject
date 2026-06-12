@@ -53,3 +53,15 @@ def send_message():
     db.session.commit()
 
     return jsonify({"status": "sent"})
+
+@chat.route("/chat/inbox")
+@login_required
+def chat_inbox():
+
+    # optional: admin/retailer view of all chats
+    messages = Chat.query.all()
+
+    return render_template(
+        "chat_inbox.html",
+        messages=messages
+    )
