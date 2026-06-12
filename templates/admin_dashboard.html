@@ -134,9 +134,10 @@ button, a.button {
 <td>{{ user.email }}</td>
 <td>{{ user.role }}</td>
 <td>
-<a class="button delete" href="/delete_user/{{user.id}}">Delete</a>
+<a class="button delete" href="/admin/delete_user/{{user.id}}">Delete</a>
+
 {% if user.role != "admin" %}
-<a class="button approve" href="/approve_user/{{user.id}}">Approve</a>
+<a class="button approve" href="/admin/approve_user/{{user.id}}">Approve</a>
 {% endif %}
 </td>
 </tr>
@@ -148,7 +149,7 @@ button, a.button {
 <div class="card">
 <h2>Products</h2>
 
-<form method="POST" enctype="multipart/form-data" action="/add_product">
+<form method="POST" enctype="multipart/form-data" action="/admin/add_product">
 <input name="name" placeholder="Name">
 <input name="price" type="number" placeholder="Price">
 <input name="stock" type="number" placeholder="Stock">
@@ -159,19 +160,28 @@ button, a.button {
 <br>
 
 <table>
-<tr><th>Image</th><th>Name</th><th>Stock</th><th>Status</th></tr>
+<tr>
+    <th>Image</th>
+    <th>Name</th>
+    <th>Stock</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
 
 {% for p in products %}
 <tr>
 
 <td>
 <div class="img-wrap">
-<img src="/static/uploads/products/{{p.image}}">
+    {% if p.image %}
+        <img src="/static/uploads/products/{{p.image}}">
+    {% else %}
+        <img src="/static/uploads/products/default.png">
+    {% endif %}
 </div>
 </td>
 
 <td>{{p.name}}</td>
-
 <td>{{p.stock}}</td>
 
 <td>
@@ -184,6 +194,12 @@ button, a.button {
 {% else %}
 <span class="stock good">GOOD</span>
 {% endif %}
+</td>
+
+<td>
+    <a class="button delete" href="/admin/delete_product/{{p.id}}">
+        Delete
+    </a>
 </td>
 
 </tr>
