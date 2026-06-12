@@ -224,3 +224,10 @@ class Question(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     question = db.Column(db.Text)
     answer = db.Column(db.Text, nullable=True)
+
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    message = db.Column(db.String(255))
+    is_read = db.Column(db.Boolean, default=False)
