@@ -93,6 +93,20 @@ def add_review():
     return jsonify({"message":"Review saved"})
 
 
+reviews = Review.query.filter_by(product_id=product_id).all()
+
+product = Product.query.get(product_id)
+
+if reviews:
+    product.rating_count = len(reviews)
+    product.avg_rating = sum(r.rating for r in reviews) / len(reviews)
+else:
+    product.rating_count = 0
+    product.avg_rating = 0
+
+db.session.commit()
+
+
 @reviews_bp.route("/ping")
 def ping():
     return "reviews working"
