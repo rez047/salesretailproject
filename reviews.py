@@ -27,37 +27,49 @@ def add_review():
     if not product_id:
         return jsonify({"error": "Missing product_id"}), 400
 
+
     # MUST BE DELIVERED PURCHASE
     order = Order.query.filter_by(
         user_id=current_user.id,
         product_id=product_id,
-        status="delivered"
+        status="Delivered"
     ).first()
 
-    if not order:
-        return jsonify({"error": "Only delivered buyers can review"}), 403
 
-    # upsert review
+    if not order:
+        return jsonify(
+            {"error": "Only delivered buyers can review"}
+        ), 403
+
+
     review = Review.query.filter_by(
         buyer_id=current_user.id,
         product_id=product_id
     ).first()
 
+
     if review:
+
         review.rating = int(data["rating"])
         review.comment = data["comment"]
+
+
     else:
+
         review = Review(
             buyer_id=current_user.id,
             product_id=product_id,
             rating=int(data["rating"]),
             comment=data["comment"]
         )
+
         db.session.add(review)
+
 
     db.session.commit()
 
-    return jsonify({"message": "saved"})
+
+    return jsonify({"message":"Review saved"})
 
 
 @reviews_bp.route("/ping")
