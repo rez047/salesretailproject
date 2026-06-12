@@ -9,14 +9,9 @@ cart = Blueprint("cart", __name__)
 # =====================================
 # ADD TO CART
 # =====================================
-@cart.route("/cart/add/<int:product_id>")
+@cart.route("/cart/add/<int:product_id>/<int:qty>")
 @login_required
-def add_to_cart(product_id):
-
-    product = Product.query.get(product_id)
-
-    if not product:
-        return "Product not found", 404
+def add_to_cart(product_id, qty):
 
     item = CartItem.query.filter_by(
         user_id=current_user.id,
@@ -24,12 +19,12 @@ def add_to_cart(product_id):
     ).first()
 
     if item:
-        item.quantity += 1
+        item.quantity += qty
     else:
         item = CartItem(
             user_id=current_user.id,
             product_id=product_id,
-            quantity=1
+            quantity=qty
         )
         db.session.add(item)
 
