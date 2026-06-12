@@ -1,113 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>StoreKeeper Dashboard</title>
+<title>StoreKeeper Dashboard</title>
 
-    <style>
-        body { font-family: Arial; margin:0; background:#f4f6f9; }
+<style>
+body{font-family:Arial;background:#f4f6f9;margin:0;}
 
-        header {
-            background:#0b3d91;
-            color:white;
-            padding:15px;
-            text-align:center;
-        }
+.topbar{
+display:flex;justify-content:space-between;
+background:#ddd;padding:12px;
+}
 
-        .topbar {
-            display:flex;
-            justify-content:space-between;
-            padding:10px 20px;
-            background:#ddd;
-        }
+.card{
+background:white;margin:15px;padding:15px;border-radius:10px;
+}
 
-        .container { padding:20px; }
+table{width:100%;border-collapse:collapse;}
+td,th{border:1px solid #ddd;padding:8px;text-align:center;}
 
-        table {
-            width:100%;
-            border-collapse:collapse;
-            background:white;
-        }
-
-        th, td {
-            padding:10px;
-            border:1px solid #ccc;
-            text-align:center;
-        }
-
-        th { background:#0b3d91; color:white; }
-
-        .btn {
-            padding:6px;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
-        }
-
-        .chat-box {
-            background:#fff;
-            padding:10px;
-            margin-top:20px;
-            border-radius:10px;
-        }
-
-    </style>
+.btn{background:green;color:white;padding:5px;border:none;}
+</style>
 </head>
 
 <body>
 
-<header>StoreKeeper Dashboard</header>
-
 <div class="topbar">
-    <div>
-        <a href="/retailer/dashboard">Home</a>
-        <a href="/chat/inbox">Chat Inbox</a>
-    </div>
-    <a href="/logout">Logout</a>
+<div>
+<a href="/retailer/dashboard">Home</a>
+<a href="/chat/inbox">Chat Inbox</a>
+<a href="/qa/inbox">Q&A</a>
+</div>
+<a href="/logout">Logout</a>
 </div>
 
-<div class="container">
-
-<h2>Orders</h2>
+<div class="card">
+<h2>Incoming Orders</h2>
 
 <table>
 <tr>
-    <th>ID</th>
-    <th>Buyer</th>
-    <th>Product</th>
-    <th>Qty</th>
-    <th>Status</th>
-    <th>Update</th>
+<th>ID</th><th>Buyer</th><th>Product</th><th>Status</th><th>Update</th>
 </tr>
 
-{% for order in orders %}
+{% for o in orders %}
 <tr>
-    <td>{{ order.id }}</td>
-    <td>{{ order.buyer.username }}</td>
-    <td>{{ order.product.name }}</td>
-    <td>{{ order.quantity }}</td>
-    <td>{{ order.status }}</td>
-    <td>
-        <form method="POST" action="/retailer/order/{{ order.id }}/status">
-            <select name="status">
-                <option>pending</option>
-                <option>shipped</option>
-                <option>delivered</option>
-            </select>
-            <button class="btn">Update</button>
-        </form>
-    </td>
+<td>{{o.id}}</td>
+<td>{{o.buyer.username}}</td>
+<td>{{o.product.name}}</td>
+<td>{{o.status}}</td>
+
+<td>
+<form method="POST" action="/retailer/order/{{o.id}}/status">
+<select name="status">
+<option>pending</option>
+<option>shipped</option>
+<option>delivered</option>
+</select>
+<button class="btn">Update</button>
+</form>
+</td>
+
 </tr>
 {% endfor %}
 </table>
-
-<!-- CHAT INBOX -->
-<div class="chat-box">
-    <h3>Product Questions / Chat Inbox</h3>
-
-    <p>Go to:</p>
-    <a href="/chat/inbox">Open Chat Inbox</a>
 </div>
 
+<!-- CHAT -->
+<div class="card">
+<h2>Product Chats</h2>
+<p>Open admin/buyer messages per product in chat inbox.</p>
+<a href="/chat/inbox">Open Chat System</a>
+</div>
+
+<!-- Q&A -->
+<div class="card">
+<h2>Product Q&A</h2>
+<p>Answer buyer questions per product.</p>
+<a href="/qa/inbox">Open Q&A</a>
+</div>
+
+<!-- REVIEWS -->
+<div class="card">
+<h2>Product Reviews</h2>
+<table>
+<tr><th>Product</th><th>Rating</th><th>Comments</th></tr>
+
+{% for p in products %}
+<tr>
+<td>{{p.name}}</td>
+<td>{{p.avg_rating}} ⭐</td>
+<td>{{p.rating_count}} reviews</td>
+</tr>
+{% endfor %}
+
+</table>
 </div>
 
 </body>
