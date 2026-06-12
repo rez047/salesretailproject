@@ -1,148 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>StoreKeeper Dashboard</title>
+    <title>StoreKeeper Dashboard</title>
 
-<style>
-body {
-    font-family: Arial;
-    margin: 0;
-    background: #f4f6f9;
-}
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f6f9;
+        }
 
-header {
-    background: #0b3d91;
-    color: white;
-    padding: 18px;
-    text-align: center;
-    font-size: 20px;
-}
+        header {
+            background: #0b3d91;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+        }
 
-/* TOPBAR */
-.topbar {
-    display:flex;
-    justify-content:space-between;
-    padding:12px 20px;
-    background:#ddd;
-}
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: #ddd;
+            align-items: center;
+        }
 
-.topbar a {
-    text-decoration:none;
-    margin-right:15px;
-    font-weight:bold;
-    color:#0b3d91;
-}
+        .topbar a {
+            text-decoration: none;
+            margin-right: 10px;
+            color: #0b3d91;
+            font-weight: bold;
+        }
 
-/* TABLE */
-.container { padding:20px; }
+        .container {
+            padding: 20px;
+        }
 
-table {
-    width:100%;
-    border-collapse: collapse;
-    background:white;
-}
+        .section {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
 
-th, td {
-    border:1px solid #ddd;
-    padding:10px;
-    text-align:center;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-th {
-    background:#0b3d91;
-    color:white;
-}
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
 
-/* STOCK COLORS */
-.stock {
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 5px;
-    display: inline-block;
-}
+        table th {
+            background: #0b3d91;
+            color: white;
+        }
 
-.stock-good { background:#d4edda; color:#155724; }
-.stock-normal { background:#fff3cd; color:#856404; }
-.stock-low { background:#ffe5b4; color:#8a4b08; }
-.stock-out { background:#f8d7da; color:#721c24; }
+        .img-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
 
-button {
-    padding:6px 10px;
-    background:green;
-    color:white;
-    border:none;
-    border-radius:5px;
-}
-</style>
+        .img-thumb:hover {
+            transform: scale(2.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .stock.green { color: green; font-weight: bold; }
+        .stock.yellow { color: orange; font-weight: bold; }
+        .stock.red { color: red; font-weight: bold; }
+        .stock.out { color: darkred; font-weight: bold; }
+    </style>
 </head>
 
 <body>
 
-<header>StoreKeeper Dashboard</header>
+<header>
+    Retailer Dashboard
+</header>
 
 <div class="topbar">
     <div>
         <a href="/retailer/dashboard">Home</a>
     </div>
+
     <a href="/logout">Logout</a>
 </div>
 
 <div class="container">
 
-<h2>Incoming Orders</h2>
+    <!-- PRODUCTS -->
+    <div class="section">
+        <h2>Products</h2>
 
-<table>
-<tr>
-    <th>ID</th>
-    <th>Customer</th>
-    <th>Email</th>
-    <th>Product</th>
-    <th>Stock Info</th>
-    <th>Quantity</th>
-    <th>Status</th>
-    <th>Update</th>
-</tr>
+        <table>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+            </tr>
 
-{% for order in orders %}
-<tr>
-    <td>{{ order.id }}</td>
-    <td>{{ order.buyer.username }}</td>
-    <td>{{ order.buyer.email }}</td>
-    <td>{{ order.product.name }}</td>
+            {% for product in products %}
+            <tr>
+                <td>
+                    {% if product.image %}
+                        <img class="img-thumb" src="/static/uploads/products/{{ product.image }}">
+                    {% endif %}
+                </td>
 
-    <!-- STOCK STATUS -->
-    <td>
-        {% set s = order.product.stock %}
-        {% if s == 0 %}
-            <span class="stock stock-out">Out</span>
-        {% elif s <= 5 %}
-            <span class="stock stock-low">{{ s }}</span>
-        {% elif s <= 20 %}
-            <span class="stock stock-normal">{{ s }}</span>
-        {% else %}
-            <span class="stock stock-good">{{ s }}</span>
-        {% endif %}
-    </td>
+                <td>{{ product.name }}</td>
+                <td>KSh {{ product.price }}</td>
 
-    <td>{{ order.quantity }}</td>
-    <td>{{ order.status }}</td>
+                <td>
+                    {% if product.stock > 10 %}
+                        <span class="stock green">{{ product.stock }}</span>
+                    {% elif product.stock > 0 %}
+                        <span class="stock yellow">{{ product.stock }}</span>
+                    {% else %}
+                        <span class="stock out">OUT</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 
-    <td>
-        <form method="POST" action="/retailer/order/{{ order.id }}/status">
-            <select name="status">
-                <option>pending</option>
-                <option>processing</option>
-                <option>shipped</option>
-                <option>delivered</option>
-            </select>
-            <button type="submit">Update</button>
-        </form>
-    </td>
-</tr>
-{% endfor %}
+    <!-- ORDERS -->
+    <div class="section">
+        <h2>Incoming Orders</h2>
 
-</table>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.buyer.username }}</td>
+                <td>{{ order.product.name }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>{{ order.status }}</td>
+                <td>
+                    <form method="POST" action="/retailer/order/{{ order.id }}/status">
+                        <select name="status">
+                            <option>pending</option>
+                            <option>processing</option>
+                            <option>shipped</option>
+                            <option>delivered</option>
+                        </select>
+                        <button>Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 
 </div>
 
