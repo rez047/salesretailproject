@@ -74,13 +74,12 @@ def delete_user(id):
 @role_required("admin")
 def approve_user(id):
 
+    print("APPROVE ROUTE HIT:", id)
+
     user = User.query.get(id)
 
     if not user:
-        return redirect("/admin")
-
-    # Do NOT allow approving admins (safety)
-    if user.role == "admin":
+        print("USER NOT FOUND")
         return redirect("/admin")
 
     user.approved = True
@@ -88,6 +87,8 @@ def approve_user(id):
     user.is_active = True
 
     db.session.commit()
+
+    print("USER APPROVED")
 
     return redirect("/admin")
 
