@@ -3,71 +3,148 @@
 
 <head>
 
-<title>Products</title>
+<title>Products - Retailshop</title>
+
+<link rel="stylesheet" href="/static/css/style.css">
 
 <style>
 
-body {
-    font-family: Arial;
-    background:#f4f6f9;
-}
-
-.grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:15px;
-}
-
-.card {
-    background:white;
-    padding:15px;
-    border-radius:10px;
-    box-shadow:0 2px 5px #ccc;
+body{
+font-family:Arial;
+background:#f4f6f9;
+margin:0;
 }
 
 
-.card img {
-    width:100%;
-    height:180px;
-    object-fit:cover;
+header{
+background:#0b3d91;
+color:white;
+padding:18px;
+text-align:center;
 }
 
 
-.btn {
-    background:green;
-    color:white;
-    padding:8px;
-    border:none;
-    cursor:pointer;
-    border-radius:5px;
-}
 
+.topbar{
 
-.box {
-
-    margin-top:15px;
-    background:#f1f1f1;
-    padding:10px;
-    border-radius:8px;
+background:white;
+padding:12px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 
 }
 
 
-.stars {
-    color:gold;
+.topbar a{
+
+text-decoration:none;
+margin-right:15px;
+font-weight:bold;
+color:#0b3d91;
+
 }
 
 
-textarea,input {
+
+.container{
+
+padding:20px;
+
+}
+
+
+
+.grid{
+
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(280px,1fr));
+gap:20px;
+
+}
+
+
+
+.card{
+
+background:white;
+padding:15px;
+border-radius:12px;
+box-shadow:0 2px 8px #ccc;
+
+}
+
+
+
+.card img{
 
 width:100%;
-padding:6px;
+height:180px;
+object-fit:cover;
+border-radius:8px;
+
+}
+
+
+
+.btn{
+
+background:green;
+color:white;
+padding:8px 12px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+display:inline-block;
+margin-top:8px;
+}
+
+
+
+.box{
+
+margin-top:15px;
+background:#f5f5f5;
+padding:12px;
+border-radius:8px;
+
+}
+
+
+
+.stars{
+
+color:gold;
+
+}
+
+
+
+input,textarea,select{
+
+width:100%;
+padding:7px;
 margin-top:5px;
 
 }
 
 
+
+.chat-btn{
+
+background:#ff9800;
+color:white;
+padding:8px;
+border-radius:5px;
+text-decoration:none;
+
+}
+
+
+
 </style>
+
 
 </head>
 
@@ -75,10 +152,66 @@ margin-top:5px;
 <body>
 
 
-<h2>Available Products</h2>
+
+<header>
+
+<h2>Retailshop Products</h2>
+
+</header>
 
 
-<div class="grid" id="products"></div>
+
+<div class="topbar">
+
+
+<div>
+
+<a href="/buyer">
+Home
+</a>
+
+
+<a href="/buyer/orders">
+My Orders
+</a>
+
+
+<a href="/cart">
+Cart
+</a>
+
+
+<a href="/chat">
+Chat
+</a>
+
+
+</div>
+
+
+
+<a href="/logout">
+Logout
+</a>
+
+
+</div>
+
+
+
+
+<div class="container">
+
+
+<div class="grid" id="products">
+
+
+</div>
+
+
+</div>
+
+
 
 
 
@@ -89,7 +222,7 @@ fetch("/products")
 
 .then(res=>res.json())
 
-.then(data=>{
+.then(products=>{
 
 
 let container =
@@ -97,7 +230,7 @@ document.getElementById("products");
 
 
 
-data.forEach(p=>{
+products.forEach(p=>{
 
 
 container.innerHTML += `
@@ -107,16 +240,18 @@ container.innerHTML += `
 
 
 
+<img src="
 ${p.image ?
-`
-<img src="/static/uploads/products/${p.image}">
-`
-:
-""}
+'/static/uploads/products/'+p.image :
+'/static/uploads/products/default.png'}
+">
 
 
 
-<h3>${p.name}</h3>
+<h3>
+${p.name}
+</h3>
+
 
 
 <p>
@@ -130,9 +265,15 @@ Stock: ${p.stock}
 
 
 
-<p id="avg-${p.id}">
+
+
+<div id="rating-${p.id}">
+
 Loading rating...
-</p>
+
+</div>
+
+
 
 
 
@@ -147,25 +288,36 @@ Add To Cart
 
 
 
-<!-- =====================
- REVIEWS
-===================== -->
+<a class="chat-btn"
+href="/chat/${p.id}">
+
+💬 Product Chat
+
+</a>
+
+
+
+
+
 
 <div class="box">
 
 
 <h4>
-⭐ Product Reviews
+⭐ Reviews
 </h4>
 
 
+
 <div id="reviews-${p.id}">
+
 Loading...
+
 </div>
 
 
 
-<select id="rating-${p.id}">
+<select id="stars-${p.id}">
 
 <option value="5">
 ★★★★★
@@ -185,27 +337,28 @@ Loading...
 
 <option value="1">
 ★
-</option>
 
+</option>
 
 </select>
 
 
 
+
 <textarea
 id="comment-${p.id}"
-placeholder="Write your review">
+placeholder="Write review">
 </textarea>
 
 
 
+
 <button class="btn"
-onclick="submitReview(${p.id})">
+onclick="review(${p.id})">
 
 Save Review
 
 </button>
-
 
 
 </div>
@@ -214,9 +367,6 @@ Save Review
 
 
 
-<!-- =====================
- PRODUCT Q&A
-===================== -->
 
 
 <div class="box">
@@ -228,26 +378,28 @@ Save Review
 
 
 <p>
-Ask questions about this product.
-Retailer or admin will answer.
+Ask about this product.
+Retailer/admin can answer.
 </p>
 
 
 
 <div id="questions-${p.id}">
+
 Loading...
+
 </div>
 
 
 
 <input
 id="question-${p.id}"
-placeholder="Ask about this product">
+placeholder="Ask question">
 
 
 
 <button class="btn"
-onclick="askQuestion(${p.id})">
+onclick="ask(${p.id})">
 
 Ask
 
@@ -256,6 +408,8 @@ Ask
 
 
 </div>
+
+
 
 
 
@@ -280,10 +434,12 @@ loadQuestions(p.id);
 
 
 
+
+
 function addToCart(id){
 
 window.location.href =
-"/cart/add/" + id;
+"/cart/add/"+id;
 
 }
 
@@ -291,9 +447,13 @@ window.location.href =
 
 
 
-/* =====================
- REVIEWS
-===================== */
+
+
+/*
+=====================
+REVIEWS
+=====================
+*/
 
 
 function loadReviews(id){
@@ -307,12 +467,13 @@ fetch("/review/"+id)
 
 
 document.getElementById(
-"avg-"+id
+"rating-"+id
 ).innerHTML =
 
 `
-⭐ ${data.average}
-(${data.count} reviews)
+⭐ Average:
+${data.average}
+(${data.count})
 `;
 
 
@@ -324,7 +485,7 @@ document.getElementById(
 
 
 
-if(data.reviews.length===0){
+if(data.reviews.length==0){
 
 box.innerHTML =
 "No reviews yet";
@@ -336,12 +497,11 @@ return;
 
 
 box.innerHTML =
-data.reviews.map(r=>{
+data.reviews.map(r=>`
 
-
-return `
 
 <div>
+
 
 <span class="stars">
 
@@ -349,19 +509,19 @@ ${"★".repeat(r.rating)}
 
 </span>
 
+
 <p>
 ${r.comment}
 </p>
 
+
 </div>
 
-`;
 
-}).join("");
-
-
+`).join("");
 
 });
+
 
 }
 
@@ -370,16 +530,18 @@ ${r.comment}
 
 
 
-function submitReview(id){
+function review(id){
 
 
-fetch("/review/add",{
+fetch("/review/add",
+{
 
 
 method:"POST",
 
 
 headers:{
+
 
 "Content-Type":
 "application/json"
@@ -395,7 +557,7 @@ product_id:id,
 
 rating:
 document.getElementById(
-"rating-"+id
+"stars-"+id
 ).value,
 
 
@@ -412,11 +574,25 @@ document.getElementById(
 
 .then(r=>r.json())
 
-.then(()=>{
+.then(data=>{
+
+
+if(data.error){
+
+alert(data.error);
+
+}
+else{
+
+alert("Review saved");
 
 loadReviews(id);
 
+}
+
+
 });
+
 
 }
 
@@ -424,10 +600,15 @@ loadReviews(id);
 
 
 
-/* =====================
- PRODUCT Q&A
-===================== */
 
+
+
+
+/*
+=====================
+PRODUCT QUESTIONS
+=====================
+*/
 
 
 function loadQuestions(id){
@@ -449,7 +630,7 @@ document.getElementById(
 
 
 
-if(data.length===0){
+if(data.length==0){
 
 box.innerHTML =
 "No questions yet";
@@ -462,14 +643,10 @@ return;
 
 
 box.innerHTML =
-data.map(q=>{
-
-
-return `
+data.map(q=>`
 
 
 <div>
-
 
 <b>
 Q:
@@ -478,19 +655,16 @@ Q:
 ${q.question}
 
 
-
 <br>
-
 
 
 <b>
 A:
 </b>
 
+${q.answer || 
+"Waiting for response"}
 
-${q.answer ?
-q.answer :
-"Waiting for retailer/admin"}
 
 <hr>
 
@@ -498,10 +672,7 @@ q.answer :
 </div>
 
 
-`;
-
-
-}).join("");
+`).join("");
 
 });
 
@@ -514,8 +685,8 @@ q.answer :
 
 
 
-function askQuestion(id){
 
+function ask(id){
 
 
 let text =
@@ -527,7 +698,6 @@ document.getElementById(
 
 if(!text.trim())
 return;
-
 
 
 
