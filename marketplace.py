@@ -130,3 +130,14 @@ def place_order():
     return jsonify({
         "message":"Order placed"
     })
+
+
+@market.route("/product/<int:product_id>/questions")
+def get_questions(product_id):
+
+    qs = Question.query.filter_by(product_id=product_id).all()
+
+    return jsonify([
+        {"q": x.question, "a": x.answer}
+        for x in qs
+    ])
