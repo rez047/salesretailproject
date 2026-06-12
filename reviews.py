@@ -11,7 +11,28 @@ reviews_bp = Blueprint("reviews", __name__)
 @reviews_bp.route("/review/product/<int:product_id>")
 @login_required
 def review_page(product_id):
-    return render_template("review_product.html", product_id=product_id)
+
+    reviews = Review.query.filter_by(
+        product_id=product_id
+    ).all()
+
+
+    order = Order.query.filter_by(
+        user_id=current_user.id,
+        product_id=product_id,
+        status="delivered"
+    ).first()
+
+
+    can_review = True if order else False
+
+
+    return render_template(
+        "review_product.html",
+        product_id=product_id,
+        reviews=reviews,
+        can_review=can_review
+    )
 
 
 # =========================
