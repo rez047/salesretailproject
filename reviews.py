@@ -32,7 +32,7 @@ def add_review():
     order = Order.query.filter_by(
         user_id=current_user.id,
         product_id=product_id,
-        status="Delivered"
+        status="delivered"
     ).first()
 
 
