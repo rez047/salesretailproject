@@ -42,3 +42,15 @@ def get_chat(product_id):
         }
         for m in messages
     ])
+
+
+@chat.route("/chat/product/<int:product_id>")
+@login_required
+def product_chat(product_id):
+
+    messages = Chat.query.filter_by(product_id=product_id).all()
+
+    return jsonify([
+        {"from": m.sender_id, "msg": m.message}
+        for m in messages
+    ])
