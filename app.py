@@ -91,8 +91,13 @@ def init_db():
 
 
 # RUN DATABASE INIT WHEN GUNICORN STARTS
-with app.app_context():
-    init_db()
+def create_app():
+    with app.app_context():
+        init_db()
+    return app
+
+
+app = create_app()
 
 
 
@@ -117,6 +122,8 @@ app.register_blueprint(retailer_bp)
 app.register_blueprint(buyer_orders)
 
 app.register_blueprint(qa)
+
+app.register_blueprint(reviews, url_prefix="")
 
 
 
