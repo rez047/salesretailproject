@@ -3,9 +3,14 @@
 <head>
     <title>Review Product</title>
 </head>
+
 <body>
 
 <h2>Review Product</h2>
+
+
+<h3>Leave a Review</h3>
+
 
 <select id="rating">
     <option value="5">★★★★★</option>
@@ -15,46 +20,185 @@
     <option value="1">★</option>
 </select>
 
+
 <br><br>
+
 
 <textarea
-    id="comment"
-    rows="5"
-    cols="50"
-    placeholder="Write your review">
+id="comment"
+rows="5"
+cols="50"
+placeholder="Write your review">
 </textarea>
+
 
 <br><br>
 
+
 <button onclick="submitReview()">
-    Submit Review
+Submit Review
 </button>
+
+
+
+<hr>
+
+
+<h2>
+Previous Reviews
+</h2>
+
+
+<div id="reviews">
+
+Loading reviews...
+
+</div>
+
+
+
+<hr>
+
+
+<h2>
+Q & A
+</h2>
+
+
+<textarea
+id="question"
+placeholder="Ask about this product">
+</textarea>
+
+<br>
+
+<button>
+Ask Question
+</button>
+
+
+
 
 <script>
 
-function submitReview() {
 
-    fetch("/review/add", {
-        method: "POST",
-        headers: {
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            product_id: {{ product_id }},
-            rating: document.getElementById("rating").value,
-            comment: document.getElementById("comment").value
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
+const product_id = {{ product_id }};
 
-        alert("Review submitted");
 
-        window.location.href="/buyer/orders";
-    });
+
+function submitReview(){
+
+
+fetch("/review/add", {
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+
+body:JSON.stringify({
+
+product_id:product_id,
+
+rating:
+document.getElementById("rating").value,
+
+
+comment:
+document.getElementById("comment").value
+
+})
+
+
+})
+
+
+.then(res=>res.json())
+
+
+.then(data=>{
+
+
+alert(data.message || data.error);
+
+
+loadReviews();
+
+
+});
+
 }
 
+
+
+
+
+function loadReviews(){
+
+
+fetch("/review/"+product_id)
+
+
+.then(res=>res.json())
+
+
+.then(data=>{
+
+
+let html="";
+
+
+if(data.reviews.length===0){
+
+html="No reviews yet";
+
+}
+
+
+data.reviews.forEach(r=>{
+
+
+html += `
+
+<div>
+
+<h3>
+${"⭐".repeat(r.rating)}
+</h3>
+
+
+<p>
+${r.comment}
+</p>
+
+<hr>
+
+</div>
+
+`;
+
+
+});
+
+
+document.getElementById("reviews").innerHTML=html;
+
+
+
+});
+
+
+}
+
+
+
+loadReviews();
+
+
 </script>
+
 
 </body>
 </html>
