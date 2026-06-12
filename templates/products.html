@@ -1,155 +1,583 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Products</title>
 
-  <style>
-    body { font-family: Arial; background:#f4f6f9; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:15px; }
-    .card { background:white; padding:15px; border-radius:10px; }
-    .btn { background:green; color:white; padding:8px; border:none; cursor:pointer; }
+<title>Products</title>
 
-    .box { margin-top:10px; background:#f8f8f8; padding:8px; border-radius:5px; }
-    .stars { color:gold; }
-  </style>
+<style>
+
+body {
+    font-family: Arial;
+    background:#f4f6f9;
+}
+
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:15px;
+}
+
+.card {
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 2px 5px #ccc;
+}
+
+
+.card img {
+    width:100%;
+    height:180px;
+    object-fit:cover;
+}
+
+
+.btn {
+    background:green;
+    color:white;
+    padding:8px;
+    border:none;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+
+.box {
+
+    margin-top:15px;
+    background:#f1f1f1;
+    padding:10px;
+    border-radius:8px;
+
+}
+
+
+.stars {
+    color:gold;
+}
+
+
+textarea,input {
+
+width:100%;
+padding:6px;
+margin-top:5px;
+
+}
+
+
+</style>
+
 </head>
+
 
 <body>
 
-<h2>Products</h2>
+
+<h2>Available Products</h2>
+
 
 <div class="grid" id="products"></div>
 
+
+
 <script>
+
+
 fetch("/products")
-.then(res => res.json())
-.then(data => {
 
-  let container = document.getElementById("products");
+.then(res=>res.json())
 
-  data.forEach(p => {
+.then(data=>{
 
-    container.innerHTML += `
-      <div class="card">
 
-        <h3>${p.name}</h3>
-        <p>Price: ${p.price}</p>
+let container =
+document.getElementById("products");
 
-        <p id="avg-${p.id}">Loading rating...</p>
 
-        <button class="btn" onclick="addToCart(${p.id})">
-          Add to Cart
-        </button>
 
-        <!-- REVIEWS -->
-        <div class="box">
-          <h4>⭐ Review</h4>
+data.forEach(p=>{
 
-          <div id="reviews-${p.id}"></div>
 
-          <select id="rating-${p.id}">
-            <option value="5">★★★★★</option>
-            <option value="4">★★★★</option>
-            <option value="3">★★★</option>
-            <option value="2">★★</option>
-            <option value="1">★</option>
-          </select>
+container.innerHTML += `
 
-          <textarea id="comment-${p.id}" placeholder="Write review"></textarea>
 
-          <button class="btn" onclick="submitReview(${p.id})">
-            Save Review
-          </button>
-        </div>
+<div class="card">
 
-        <!-- CHAT -->
-        <div class="box">
-          <h4>💬 Q&A</h4>
 
-          <div id="chat-${p.id}"></div>
 
-          <input id="msg-${p.id}" placeholder="Ask question">
+${p.image ?
+`
+<img src="/static/uploads/products/${p.image}">
+`
+:
+""}
 
-          <button class="btn" onclick="sendQuestion(${p.id})">
-            Send
-          </button>
-        </div>
 
-      </div>
-    `;
 
-    loadReviews(p.id);
-    loadChat(p.id);
-  });
+<h3>${p.name}</h3>
+
+
+<p>
+Price: ${p.price}
+</p>
+
+
+<p>
+Stock: ${p.stock}
+</p>
+
+
+
+<p id="avg-${p.id}">
+Loading rating...
+</p>
+
+
+
+<button class="btn"
+onclick="addToCart(${p.id})">
+
+Add To Cart
+
+</button>
+
+
+
+
+
+<!-- =====================
+ REVIEWS
+===================== -->
+
+<div class="box">
+
+
+<h4>
+⭐ Product Reviews
+</h4>
+
+
+<div id="reviews-${p.id}">
+Loading...
+</div>
+
+
+
+<select id="rating-${p.id}">
+
+<option value="5">
+★★★★★
+</option>
+
+<option value="4">
+★★★★
+</option>
+
+<option value="3">
+★★★
+</option>
+
+<option value="2">
+★★
+</option>
+
+<option value="1">
+★
+</option>
+
+
+</select>
+
+
+
+<textarea
+id="comment-${p.id}"
+placeholder="Write your review">
+</textarea>
+
+
+
+<button class="btn"
+onclick="submitReview(${p.id})">
+
+Save Review
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+<!-- =====================
+ PRODUCT Q&A
+===================== -->
+
+
+<div class="box">
+
+
+<h4>
+💬 Product Q&A
+</h4>
+
+
+<p>
+Ask questions about this product.
+Retailer or admin will answer.
+</p>
+
+
+
+<div id="questions-${p.id}">
+Loading...
+</div>
+
+
+
+<input
+id="question-${p.id}"
+placeholder="Ask about this product">
+
+
+
+<button class="btn"
+onclick="askQuestion(${p.id})">
+
+Ask
+
+</button>
+
+
+
+</div>
+
+
+
+</div>
+
+
+`;
+
+
+
+loadReviews(p.id);
+
+loadQuestions(p.id);
+
+
+
 });
 
+});
+
+
+
+
+
 function addToCart(id){
-  window.location.href = "/cart/add/" + id;
+
+window.location.href =
+"/cart/add/" + id;
+
 }
 
-/* =========================
-   REVIEWS
-========================= */
 
-function loadReviews(productId){
 
-  fetch("/review/" + productId)
-  .then(r => r.json())
-  .then(data => {
 
-    document.getElementById("avg-" + productId).innerHTML =
-      "⭐ " + data.average + " (" + data.count + ")";
 
-    document.getElementById("reviews-" + productId).innerHTML =
-      data.reviews.map(r =>
-        `<p>⭐ ${r.rating} - ${r.comment}</p>`
-      ).join("");
-  });
+/* =====================
+ REVIEWS
+===================== */
+
+
+function loadReviews(id){
+
+
+fetch("/review/"+id)
+
+.then(r=>r.json())
+
+.then(data=>{
+
+
+document.getElementById(
+"avg-"+id
+).innerHTML =
+
+`
+⭐ ${data.average}
+(${data.count} reviews)
+`;
+
+
+
+let box =
+document.getElementById(
+"reviews-"+id
+);
+
+
+
+if(data.reviews.length===0){
+
+box.innerHTML =
+"No reviews yet";
+
+return;
+
 }
 
-function submitReview(productId){
 
-  fetch("/review/add", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      product_id: productId,
-      rating: document.getElementById("rating-"+productId).value,
-      comment: document.getElementById("comment-"+productId).value
-    })
-  }).then(() => loadReviews(productId));
+
+box.innerHTML =
+data.reviews.map(r=>{
+
+
+return `
+
+<div>
+
+<span class="stars">
+
+${"★".repeat(r.rating)}
+
+</span>
+
+<p>
+${r.comment}
+</p>
+
+</div>
+
+`;
+
+}).join("");
+
+
+
+});
+
 }
 
-/* =========================
-   CHAT
-========================= */
 
-function loadChat(productId){
 
-  fetch("/chat/product/" + productId)
-  .then(r => r.json())
-  .then(data => {
 
-    document.getElementById("chat-" + productId).innerHTML =
-      data.map(m => `<p>User ${m.from}: ${m.msg}</p>`).join("");
-  });
+
+
+function submitReview(id){
+
+
+fetch("/review/add",{
+
+
+method:"POST",
+
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+
+body:JSON.stringify({
+
+
+product_id:id,
+
+
+rating:
+document.getElementById(
+"rating-"+id
+).value,
+
+
+comment:
+document.getElementById(
+"comment-"+id
+).value
+
+
+})
+
+
+})
+
+.then(r=>r.json())
+
+.then(()=>{
+
+loadReviews(id);
+
+});
+
 }
 
-function sendQuestion(productId){
 
-  let msg = document.getElementById("msg-" + productId).value;
 
-  fetch("/chat/send", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      product_id: productId,
-      message: msg,
-      receiver_id: 1
-    })
-  }).then(() => loadChat(productId));
+
+
+/* =====================
+ PRODUCT Q&A
+===================== */
+
+
+
+function loadQuestions(id){
+
+
+fetch(
+"/product/"+id+"/questions"
+)
+
+.then(r=>r.json())
+
+.then(data=>{
+
+
+let box =
+document.getElementById(
+"questions-"+id
+);
+
+
+
+if(data.length===0){
+
+box.innerHTML =
+"No questions yet";
+
+return;
+
 }
+
+
+
+
+box.innerHTML =
+data.map(q=>{
+
+
+return `
+
+
+<div>
+
+
+<b>
+Q:
+</b>
+
+${q.question}
+
+
+
+<br>
+
+
+
+<b>
+A:
+</b>
+
+
+${q.answer ?
+q.answer :
+"Waiting for retailer/admin"}
+
+<hr>
+
+
+</div>
+
+
+`;
+
+
+}).join("");
+
+});
+
+
+}
+
+
+
+
+
+
+
+function askQuestion(id){
+
+
+
+let text =
+document.getElementById(
+"question-"+id
+).value;
+
+
+
+if(!text.trim())
+return;
+
+
+
+
+fetch(
+"/product/"+id+"/question",
+{
+
+
+method:"POST",
+
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+
+body:JSON.stringify({
+
+question:text
+
+})
+
+
+})
+
+.then(()=>{
+
+
+document.getElementById(
+"question-"+id
+).value="";
+
+
+loadQuestions(id);
+
+
+});
+
+
+}
+
+
+
 </script>
 
+
+
 </body>
+
 </html>
