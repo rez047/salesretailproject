@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from models import User, Product, Order
 from extensions import db
 from utils import allowed_file
+from security import role_required
 
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -15,21 +16,6 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 UPLOAD_FOLDER = "static/uploads/products"
 
-
-# =========================
-# ROLE PROTECTION
-# =========================
-def role_required(role):
-    from functools import wraps
-
-    def wrapper(func):
-        @wraps(func)
-        def decorated(*args, **kwargs):
-            if not current_user.is_authenticated or current_user.role != role:
-                return "Unauthorized", 403
-            return func(*args, **kwargs)
-        return decorated
-    return wrapper
 
 
 # =========================
@@ -55,28 +41,27 @@ def dashboard():
 # =========================
 # USERS
 # =========================
-@admin_bp.route("/approve_user/<int:id>")
+
+@admin_bp.route("/approve_user/<int:id>", methods=["GET"])
 @login_required
 @role_required("admin")
 def approve_user(id):
 
-    print("APPROVE ROUTE HIT:", id)
+    user = db.session.get(User, id)
 
-    user = User.query.get(id)
+    if user is None:
+        return redirect("/admin/")
 
-    if not user:
-        print("USER NOT FOUND")
-        return redirect("/admin")
 
     user.approved = True
     user.is_verified = True
     user.is_active = True
 
+
     db.session.commit()
 
-    print("USER APPROVED")
 
-    return redirect("/admin")
+    return redirect("/admin/")
 
 
 @admin_bp.route("/delete_user/<int:id>")
@@ -90,7 +75,7 @@ def delete_user(id):
         db.session.delete(user)
         db.session.commit()
 
-    return redirect("/admin")
+    return redirect("/admin/")
 # =========================
 # PRODUCTS (WITH IMAGE UPLOAD)
 # =========================
@@ -138,7 +123,7 @@ def add_product():
     db.session.add(product)
     db.session.commit()
 
-    return redirect("/admin")
+    return redirect("/admin/")
 
 
 # =========================
@@ -155,4 +140,4 @@ def delete_product(id):
         db.session.delete(product)
         db.session.commit()
 
-    return redirect("/admin")
+    return redirect("/admin/")
