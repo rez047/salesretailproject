@@ -58,7 +58,13 @@ def approve_user(id):
     user.is_active = True
 
 
+    db.session.flush()
+
     db.session.commit()
+
+
+    # force reload from database
+    db.session.expire_all()
 
 
     return redirect("/admin/")
