@@ -5,226 +5,688 @@
 <title>Admin Control Panel</title>
 
 <style>
+
 body {
     font-family: Arial;
-    margin: 0;
-    background: #f4f6f9;
+    margin:0;
+    background:#f4f6f9;
 }
 
-/* HEADER */
+
 header {
-    background: #0b3d91;
-    color: white;
-    padding: 18px;
-    text-align: center;
-    font-size: 22px;
+    background:#0b3d91;
+    color:white;
+    padding:18px;
+    text-align:center;
+    font-size:22px;
 }
 
-/* TOPBAR */
+
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: #ddd;
+    display:flex;
+    justify-content:space-between;
+    padding:12px 20px;
+    background:#ddd;
 }
+
 
 .topbar a {
-    margin-right: 15px;
-    font-weight: bold;
-    color: #0b3d91;
-    text-decoration: none;
+    margin-right:15px;
+    font-weight:bold;
+    color:#0b3d91;
+    text-decoration:none;
 }
 
-/* CONTAINER */
-.container { padding: 20px; }
+
+.container {
+    padding:20px;
+}
+
 
 .card {
-    background: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+
 }
 
-/* TABLE */
+
 table {
-    width: 100%;
-    border-collapse: collapse;
+
+    width:100%;
+    border-collapse:collapse;
+
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
+
+th,td {
+
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+
 }
 
-/* BUTTONS */
-button, a.button {
-    padding: 6px 10px;
-    border-radius: 5px;
-    color: white;
-    text-decoration: none;
-    margin: 2px;
+
+th {
+
+    background:#0b3d91;
+    color:white;
+
 }
 
-.delete { background: red; }
-.approve { background: green; }
-.add { background: orange; }
 
-/* IMAGE ZOOM */
+
+button,
+a.button {
+
+    padding:7px 12px;
+    border-radius:5px;
+    color:white;
+    text-decoration:none;
+    margin:2px;
+    display:inline-block;
+
+}
+
+
+.delete {
+    background:red;
+}
+
+
+.approve {
+
+    background:green;
+
+}
+
+
+.add {
+
+    background:orange;
+
+}
+
+
+
 .img-wrap {
-    width: 60px;
-    height: 60px;
-    overflow: hidden;
-    border-radius: 6px;
-    margin: auto;
-    border: 1px solid #ccc;
+
+    width:60px;
+    height:60px;
+    overflow:hidden;
+    border-radius:6px;
+    margin:auto;
+    border:1px solid #ccc;
+
 }
+
 
 .img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: 0.3s;
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:0.3s;
+
 }
+
 
 .img-wrap:hover img {
-    transform: scale(2.5);
+
+    transform:scale(2.5);
+
 }
 
-/* STOCK */
-.stock {
-    padding: 5px 8px;
-    border-radius: 5px;
-    font-weight: bold;
+
+
+
+.status {
+
+    padding:5px 8px;
+    border-radius:5px;
+    font-weight:bold;
+
 }
 
-.good { background:#d4edda; color:#155724; }
-.mid { background:#fff3cd; color:#856404; }
-.low { background:#ffe5b4; color:#8a4b08; }
-.out { background:#f8d7da; color:#721c24; }
+
+.true {
+
+    background:#d4edda;
+    color:#155724;
+
+}
+
+
+.false {
+
+    background:#f8d7da;
+    color:#721c24;
+
+}
+
+
+.good {
+background:#d4edda;
+color:#155724;
+}
+
+
+.mid {
+background:#fff3cd;
+color:#856404;
+}
+
+
+.low {
+background:#ffe5b4;
+color:#8a4b08;
+}
+
+
+.out {
+background:#f8d7da;
+color:#721c24;
+}
+
+
 </style>
+
 </head>
+
 
 <body>
 
-<header>Admin Control Panel</header>
+
+<header>
+Admin Control Panel
+</header>
+
+
 
 <div class="topbar">
-    <div>
-        <a href="/admin">Home</a>
-        <a href="/retailer/dashboard">Store Keeper</a>
-        <a href="/chat/inbox">Chat Inbox</a>
-    </div>
-    <a href="/logout">Logout</a>
+
+<div>
+
+<a href="/admin/">Home</a>
+
+<a href="/retailer/dashboard">
+Store Keeper
+</a>
+
+
+<a href="/chat/inbox">
+Chat Inbox
+</a>
+
+
 </div>
+
+
+<a href="/logout">
+Logout
+</a>
+
+
+</div>
+
+
+
+
 
 <div class="container">
 
+
+
+
+
 <!-- USERS -->
+
 <div class="card">
-<h2>Users</h2>
+
+
+<h2>User Management</h2>
+
+
+<p>
+After approving a user, refresh page and check the database values below.
+</p>
+
+
+
 <table>
-<tr><th>ID</th><th>User</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+
+
+<tr>
+
+<th>ID</th>
+<th>Username</th>
+<th>Email</th>
+<th>Role</th>
+
+<th>Approved</th>
+<th>Verified</th>
+<th>Active</th>
+
+<th>Actions</th>
+
+
+</tr>
+
+
 
 {% for user in users %}
-<tr>
-<td>{{ user.id }}</td>
-<td>{{ user.username }}</td>
-<td>{{ user.email }}</td>
-<td>{{ user.role }}</td>
-<td>
-<a class="button delete" href="/admin/delete_user/{{user.id}}">Delete</a>
 
-{% if user.role != "admin" %}
-<a class="button approve" href="/admin/approve_user/{{user.id}}">Approve</a>
-{% endif %}
+
+<tr>
+
+
+<td>
+{{user.id}}
 </td>
+
+
+<td>
+{{user.username}}
+</td>
+
+
+<td>
+{{user.email}}
+</td>
+
+
+<td>
+{{user.role}}
+</td>
+
+
+
+<td>
+
+{% if user.approved %}
+
+<span class="status true">
+TRUE
+</span>
+
+{% else %}
+
+<span class="status false">
+FALSE
+</span>
+
+{% endif %}
+
+</td>
+
+
+
+
+<td>
+
+{% if user.is_verified %}
+
+<span class="status true">
+TRUE
+</span>
+
+{% else %}
+
+<span class="status false">
+FALSE
+</span>
+
+{% endif %}
+
+
+</td>
+
+
+
+
+
+<td>
+
+{% if user.is_active %}
+
+<span class="status true">
+TRUE
+</span>
+
+{% else %}
+
+<span class="status false">
+FALSE
+</span>
+
+{% endif %}
+
+
+</td>
+
+
+
+
+
+<td>
+
+
+<a class="button delete"
+href="/admin/delete_user/{{user.id}}">
+Delete
+</a>
+
+
+
+{% if user.role != "admin" and not user.approved %}
+
+
+<a class="button approve"
+href="/admin/approve_user/{{user.id}}">
+Approve
+</a>
+
+
+{% endif %}
+
+
+</td>
+
+
+
 </tr>
+
+
 {% endfor %}
+
+
+
 </table>
+
+
 </div>
 
-<!-- PRODUCTS -->
-<div class="card">
-<h2>Products</h2>
 
-<form method="POST" enctype="multipart/form-data" action="/admin/add_product">
-<input name="name" placeholder="Name">
-<input name="price" type="number" placeholder="Price">
-<input name="stock" type="number" placeholder="Stock">
-<input type="file" name="image">
-<button class="add">Add</button>
+
+
+
+
+
+
+
+<!-- PRODUCTS -->
+
+
+<div class="card">
+
+
+<h2>Product Management</h2>
+
+
+
+<form method="POST"
+action="/admin/add_product"
+enctype="multipart/form-data">
+
+
+<input name="name"
+placeholder="Name"
+required>
+
+
+<input name="price"
+type="number"
+placeholder="Price"
+required>
+
+
+<input name="stock"
+type="number"
+placeholder="Stock"
+required>
+
+
+<input type="file"
+name="image">
+
+
+<button class="add">
+Add Product
+</button>
+
+
 </form>
+
+
 
 <br>
 
+
+
 <table>
+
+
 <tr>
-    <th>Image</th>
-    <th>Name</th>
-    <th>Stock</th>
-    <th>Status</th>
-    <th>Action</th>
+
+<th>Image</th>
+<th>Name</th>
+<th>Stock</th>
+<th>Status</th>
+<th>Action</th>
+
+
 </tr>
+
+
+
 
 {% for p in products %}
+
+
+
 <tr>
 
+
+
 <td>
+
 <div class="img-wrap">
-    {% if p.image %}
-        <img src="/static/uploads/products/{{p.image}}">
-    {% else %}
-        <img src="/static/uploads/products/default.png">
-    {% endif %}
-</div>
-</td>
 
-<td>{{p.name}}</td>
-<td>{{p.stock}}</td>
 
-<td>
-{% if p.stock == 0 %}
-<span class="stock out">OUT</span>
-{% elif p.stock <= 5 %}
-<span class="stock low">LOW</span>
-{% elif p.stock <= 20 %}
-<span class="stock mid">OK</span>
+{% if p.image %}
+
+<img src="/static/uploads/products/{{p.image}}">
+
+
 {% else %}
-<span class="stock good">GOOD</span>
+
+<img src="/static/uploads/products/default.png">
+
+
 {% endif %}
+
+
+
+</div>
+
+
 </td>
 
+
+
+
 <td>
-    <a class="button delete" href="/admin/delete_product/{{p.id}}">
-        Delete
-    </a>
+{{p.name}}
 </td>
+
+
+
+<td>
+{{p.stock}}
+</td>
+
+
+
+<td>
+
+
+{% if p.stock == 0 %}
+
+<span class="status out">
+OUT
+</span>
+
+
+{% elif p.stock <=5 %}
+
+
+<span class="status low">
+LOW
+</span>
+
+
+
+{% elif p.stock <=20 %}
+
+
+<span class="status mid">
+OK
+</span>
+
+
+{% else %}
+
+
+
+<span class="status good">
+GOOD
+</span>
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+
+<td>
+
+
+<a class="button delete"
+href="/admin/delete_product/{{p.id}}">
+Delete
+</a>
+
+
+</td>
+
+
 
 </tr>
+
+
+
 {% endfor %}
+
+
+
 </table>
+
+
 </div>
+
+
+
+
+
+
+
 
 <!-- ORDERS -->
+
+
 <div class="card">
+
+
 <h2>Orders</h2>
+
+
+
 <table>
-<tr><th>ID</th><th>User</th><th>Product</th><th>Status</th></tr>
+
+
+<tr>
+
+<th>ID</th>
+<th>Buyer</th>
+<th>Product</th>
+<th>Quantity</th>
+<th>Status</th>
+
+</tr>
+
+
+
 
 {% for o in orders %}
+
+
 <tr>
-<td>{{o.id}}</td>
-<td>{{o.buyer.username}}</td>
-<td>{{o.product.name}}</td>
-<td>{{o.status}}</td>
+
+
+<td>
+{{o.id}}
+</td>
+
+
+<td>
+{{o.buyer.username}}
+</td>
+
+
+<td>
+{{o.product.name}}
+</td>
+
+
+<td>
+{{o.quantity}}
+</td>
+
+
+<td>
+{{o.status}}
+</td>
+
+
 </tr>
+
+
+
 {% endfor %}
 
+
+
 </table>
-</div>
+
+
 
 </div>
+
+
+
+
+
+
+</div>
+
+
 </body>
 </html>
