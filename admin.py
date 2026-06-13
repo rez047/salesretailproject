@@ -26,9 +26,14 @@ UPLOAD_FOLDER = "static/uploads/products"
 @role_required("admin")
 def dashboard():
 
-    users = User.query.all()
-    products = Product.query.all()
-    orders = Order.query.all()
+    db.session.expire_all()
+
+    users = db.session.query(User).order_by(User.id.desc()).all()
+
+    products = db.session.query(Product).all()
+
+    orders = db.session.query(Order).all()
+
 
     return render_template(
         "admin_dashboard.html",
