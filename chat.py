@@ -1,27 +1,25 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user
-from models import db, Chat
 
-chat = Blueprint("chat", __name__)
+from extensions import db
+from models import Chat, User
 
 
-# =========================
-# PRODUCT CHAT PAGE
-# =========================
-@chat.route("/chat/product/<int:product_id>")
+chat = Blueprint("chat", __name__, url_prefix="/chat")
+
+
+# =====================================
+# PRODUCT CHAT (BUYER ↔ RETAILER)
+# =====================================
+
+@chat.route("/product/<int:product_id>")
 @login_required
-def product_chat_page(product_id):
-    return render_template("chat_product.html", product_id=product_id)
+def product_chat(product_id):
 
+    messages = Chat.query.filter_by(
+        product_id=product_id
+    ).order_by(Chat.id.asc()).all()
 
-# =========================
-# LOAD CHAT MESSAGES
-# =========================
-@chat.route("/chat/messages/<int:product_id>")
-@login_required
-def get_messages(product_id):
-
-    messages = Chat.query.filter_by(product_id=product_id).all()
 
     return jsonify([
         {
@@ -33,33 +31,55 @@ def get_messages(product_id):
     ])
 
 
-# =========================
+
+# =====================================
 # SEND MESSAGE
-# =========================
-@chat.route("/chat/send", methods=["POST"])
+# =====================================
+
+@chat.route("/send", methods=["POST"])
 @login_required
 def send_message():
 
     data = request.json
 
-    msg = Chat(
+
+    message = Chat(
         product_id=data.get("product_id"),
+
         sender_id=current_user.id,
+
         receiver_id=data.get("receiver_id"),
-        message=data["message"]
+
+        message=data.get("message")
     )
 
-    db.session.add(msg)
+
+    db.session.add(message)
+
     db.session.commit()
 
-    return jsonify({"status": "sent"})
 
-@chat.route("/chat/inbox")
+    return jsonify({
+        "status":"sent"
+    })
+
+
+
+# =====================================
+# ADMIN / USER CHAT INBOX
+# =====================================
+
+@chat.route("/inbox")
 @login_required
-def chat_inbox():
+def inbox():
 
-    # optional: admin/retailer view of all chats
-    messages = Chat.query.all()
+    messages = Chat.query.filter(
+        (Chat.sender_id == current_user.id) |
+        (Chat.receiver_id == current_user.id)
+    ).order_by(
+        Chat.id.desc()
+    ).all()
+
 
     return render_template(
         "chat_inbox.html",
