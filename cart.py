@@ -13,20 +13,21 @@ cart = Blueprint("cart", __name__)
 @login_required
 def add_to_cart(product_id):
 
-    qty = int(request.form.get("qty",1))
+    qty = int(request.form.get("qty", 1))
+
 
     product = Product.query.get(product_id)
 
     if not product:
-        return "Product not found",404
+        return "Product not found", 404
 
 
-    if qty <= 0:
-        return "Invalid quantity",400
+    if qty < 1:
+        qty = 1
 
 
     if qty > product.stock:
-        return "Not enough stock available",400
+        return "Quantity exceeds available stock", 400
 
 
 
