@@ -177,6 +177,16 @@ th {
 <td>{{o.buyer.username}}</td>
 <td>{{o.quantity}}</td>
 <td>{{o.status}}</td>
+<td>
+<form method="POST" action="/retailer/order/{{o.id}}/status">
+<select name="status">
+<option>pending</option>
+<option>shipped</option>
+<option>delivered</option>
+</select>
+<button class="btn">Update</button>
+</form>
+</td>
 </tr>
 
 {% endfor %}
