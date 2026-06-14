@@ -33,6 +33,54 @@ td,th{border:1px solid #ddd;padding:8px;text-align:center;}
 <a href="/logout">Logout</a>
 </div>
 
+<!-- PRODUCTS -->
+<div class="card">
+<h2>My Products</h2>
+
+<table>
+<tr>
+<th>Image</th>
+<th>Name</th>
+<th>Price</th>
+<th>Stock</th>
+<th>Status</th>
+</tr>
+
+{% for p in products %}
+
+<tr>
+
+<td>
+<div class="img-wrap">
+{% if p.image %}
+<img src="/static/uploads/products/{{p.image}}">
+{% else %}
+<img src="/static/uploads/products/default.png">
+{% endif %}
+</div>
+</td>
+
+<td>{{p.name}}</td>
+<td>{{p.price}}</td>
+<td>{{p.stock}}</td>
+
+<td>
+{% if p.stock == 0 %}
+<span class="out">OUT</span>
+{% elif p.stock <= 5 %}
+<span class="low">LOW</span>
+{% else %}
+<span class="good">GOOD</span>
+{% endif %}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>  
 <div class="card">
 <h2>Incoming Orders</h2>
 
