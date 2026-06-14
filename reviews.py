@@ -17,12 +17,27 @@ def review_page(product_id):
     product = Product.query.get(product_id)
 
     if not product:
-        return "Product not found", 404
+        return "Product not found",404
+
+
+    reviews = Review.query.filter_by(
+        product_id=product_id
+    ).all()
+
+
+    from models import ProductQuestion
+
+
+    questions = ProductQuestion.query.filter_by(
+        product_id=product_id
+    ).all()
 
 
     return render_template(
         "review_product.html",
-        product=product
+        product=product,
+        reviews=reviews,
+        questions=questions
     )
 
 
