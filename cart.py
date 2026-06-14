@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, render_template
+from flask import Blueprint, redirect, url_for, render_template, request
 from flask_login import login_required, current_user
 
 from models import db, Product, CartItem, Order
@@ -9,26 +9,57 @@ cart = Blueprint("cart", __name__)
 # =====================================
 # ADD TO CART
 # =====================================
-@cart.route("/cart/add/<int:product_id>/<int:qty>")
+@cart.route("/cart/add/<int:product_id>", methods=["POST"])
 @login_required
-def add_to_cart(product_id, qty):
+def add_to_cart(product_id):
+
+    qty = int(request.form.get("qty",1))
+
+    product = Product.query.get(product_id)
+
+    if not product:
+        return "Product not found",404
+
+
+    if qty <= 0:
+        return "Invalid quantity",400
+
+
+    if qty > product.stock:
+        return "Not enough stock available",400
+
+
 
     item = CartItem.query.filter_by(
         user_id=current_user.id,
         product_id=product_id
     ).first()
 
+
+
     if item:
+
         item.quantity += qty
+
+
+        if item.quantity > product.stock:
+            item.quantity = product.stock
+
+
     else:
+
         item = CartItem(
             user_id=current_user.id,
             product_id=product_id,
             quantity=qty
         )
+
         db.session.add(item)
 
+
+
     db.session.commit()
+
 
     return redirect(url_for("cart.view_cart"))
 
