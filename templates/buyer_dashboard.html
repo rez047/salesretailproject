@@ -1,97 +1,145 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>Buyer Dashboard</title>
 
 <style>
-body{font-family:Arial;background:#f4f6f9;margin:0;}
-
-.topbar{
-display:flex;justify-content:space-between;
-background:#ddd;padding:12px;
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #f4f6f9;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:15px;
-padding:15px;
+header {
+    background: #0b3d91;
+    color: white;
+    padding: 18px;
+    text-align: center;
+    font-size: 22px;
 }
 
-.card{
-background:white;padding:15px;border-radius:10px;
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: #ddd;
 }
 
-.img-wrap{
-width:100%;height:180px;overflow:hidden;border-radius:8px;
+.topbar a {
+    margin-right: 15px;
+    font-weight: bold;
+    color: #0b3d91;
+    text-decoration: none;
 }
 
-.img-wrap img{
-width:100%;height:100%;object-fit:cover;
-transition:0.3s;
+.container {
+    padding: 20px;
 }
 
-.img-wrap:hover img{
-transform:scale(1.4);
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.btn{background:green;color:white;padding:6px;border:none;}
-
-.stock{
-font-weight:bold;
+/* PRODUCTS GRID */
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
 }
 
-.out{color:red;}
-.low{color:orange;}
-.good{color:green;}
+.product {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* IMAGE HOVER (same as admin) */
+.img-wrap {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.3s;
+}
+
+.img-wrap:hover img {
+    transform: scale(2.2);
+}
+
+button {
+    background: #0b3d91;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
 </style>
+
 </head>
 
 <body>
 
+<header>Buyer Dashboard</header>
+
 <div class="topbar">
-<div>
-<a href="/buyer">Home</a>
-<a href="/buyer/orders">My Orders</a>
-<a href="/cart">Cart</a>
-<a href="/chat/inbox">Chat</a>
-</div>
-<a href="/logout">Logout</a>
+    <div>
+        <a href="/buyer">Home</a>
+        <a href="/cart">Cart</a>
+        <a href="/orders">My Orders</a>
+        <a href="/chat/inbox">Chat</a>
+    </div>
+    <a href="/logout">Logout</a>
 </div>
 
-<div class="grid">
+<div class="container">
+
+<div class="card">
+<h2>Available Products</h2>
+
+<div class="products">
 
 {% for p in products %}
-<div class="card">
+
+<div class="product">
 
 <div class="img-wrap">
+{% if p.image %}
 <img src="/static/uploads/products/{{p.image}}">
+{% else %}
+<img src="/static/uploads/products/default.png">
+{% endif %}
 </div>
 
 <h3>{{p.name}}</h3>
+<p><b>KES {{p.price}}</b></p>
+<p>Stock: {{p.stock}}</p>
 
-<p>Price: {{p.price}}</p>
-
-<p class="stock
-{% if p.stock==0 %}out{% elif p.stock<=5 %}low{% else %}good{% endif %}
-">
-Stock: {{p.stock}}
-</p>
-
-<a class="btn" href="/cart/add/{{p.id}}">
-Add to Cart
-</a>
-
-<a class="btn" href="/review/product/{{p.id}}">
-Reviews
-</a>
-
-<a class="btn" href="/chat/{{p.id}}">
-Q&A Chat
-</a>
+<form method="POST" action="/cart/add/{{p.id}}">
+    <button>Add to Cart</button>
+</form>
 
 </div>
+
 {% endfor %}
+
+</div>
+
+</div>
 
 </div>
 
