@@ -129,8 +129,25 @@ button {
 <p><b>KES {{p.price}}</b></p>
 <p>Stock: {{p.stock}}</p>
 
-<form method="POST" action="/cart/add/{{p.id}}">
-    <button>Add to Cart</button>
+<form method="GET" action="/cart/add/{{p.id}}/1">
+
+    <label>
+        Quantity:
+    </label>
+
+    <input 
+        type="number"
+        name="qty"
+        value="1"
+        min="1"
+        max="{{p.stock}}"
+        style="width:60px;"
+    >
+
+    <button type="submit">
+        Add to Cart
+    </button>
+
 </form>
 
 </div>
