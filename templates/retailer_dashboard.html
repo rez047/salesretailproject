@@ -1,39 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>StoreKeeper Dashboard</title>
+<meta charset="UTF-8">
+<title>Retailer Dashboard</title>
 
 <style>
-body{font-family:Arial;background:#f4f6f9;margin:0;}
-
-.topbar{
-display:flex;justify-content:space-between;
-background:#ddd;padding:12px;
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #f4f6f9;
 }
 
-.card{
-background:white;margin:15px;padding:15px;border-radius:10px;
+header {
+    background: #0b3d91;
+    color: white;
+    padding: 18px;
+    text-align: center;
+    font-size: 22px;
 }
 
-table{width:100%;border-collapse:collapse;}
-td,th{border:1px solid #ddd;padding:8px;text-align:center;}
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: #ddd;
+}
 
-.btn{background:green;color:white;padding:5px;border:none;}
+.topbar a {
+    margin-right: 15px;
+    font-weight: bold;
+    color: #0b3d91;
+    text-decoration: none;
+}
+
+.container {
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* TABLE STYLE LIKE ADMIN */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #0b3d91;
+    color: white;
+}
+
+/* IMAGE HOVER */
+.img-wrap {
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+    border-radius: 6px;
+    margin: auto;
+    border: 1px solid #ccc;
+}
+
+.img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.3s;
+}
+
+.img-wrap:hover img {
+    transform: scale(2.5);
+}
+
+/* STATUS */
+.low { background:#ffe5b4; color:#8a4b08; padding:5px; border-radius:5px; }
+.good { background:#d4edda; color:#155724; padding:5px; border-radius:5px; }
+.out { background:#f8d7da; color:#721c24; padding:5px; border-radius:5px; }
 </style>
+
 </head>
 
 <body>
 
+<header>Retailer Dashboard</header>
+
 <div class="topbar">
-<div>
-<a href="/retailer/dashboard">Home</a>
-<a href="/retailer/products">My Products</a>
-<a href="/retailer/orders">Orders</a>
-<a href="/chat/inbox">Chat Inbox</a>
-<a href="/qa/inbox">Q&A</a>
+    <div>
+        <a href="/retailer/dashboard">Home</a>
+        <a href="/retailer/products">My Products</a>
+        <a href="/retailer/orders">Orders</a>
+        <a href="/chat/inbox">Chat</a>
+    </div>
+    <a href="/logout">Logout</a>
 </div>
-<a href="/logout">Logout</a>
-</div>
+
+<div class="container">
 
 <!-- PRODUCTS -->
 <div class="card">
@@ -82,43 +154,34 @@ td,th{border:1px solid #ddd;padding:8px;text-align:center;}
 
 </table>
 
-</div>  
+</div>
+
+<!-- ORDERS -->
 <div class="card">
 <h2>Incoming Orders</h2>
 
 <table>
 <tr>
-<th>ID</th><th>Buyer</th><th>Product</th><th>Status</th><th>Update</th>
+<th>ID</th>
+<th>Product</th>
+<th>Buyer</th>
+<th>Quantity</th>
+<th>Status</th>
 </tr>
 
 {% for o in orders %}
+
 <tr>
 <td>{{o.id}}</td>
-<td>{{o.buyer.username}}</td>
 <td>{{o.product.name}}</td>
+<td>{{o.buyer.username}}</td>
+<td>{{o.quantity}}</td>
 <td>{{o.status}}</td>
-
-<td>
-<form method="POST" action="/retailer/order/{{o.id}}/status">
-<select name="status">
-<option>pending</option>
-<option>shipped</option>
-<option>delivered</option>
-</select>
-<button class="btn">Update</button>
-</form>
-</td>
-
 </tr>
+
 {% endfor %}
 </table>
-</div>
 
-<!-- CHAT -->
-<div class="card">
-<h2>Product Chats</h2>
-<p>Open admin/buyer messages per product in chat inbox.</p>
-<a href="/chat/inbox">Open Chat System</a>
 </div>
 
 <!-- Q&A -->
