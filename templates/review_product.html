@@ -1,137 +1,130 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
-    <title>Review Product</title>
+
+<title>Review Product</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+}
+
+.card{
+
+background:white;
+padding:25px;
+margin:40px auto;
+width:400px;
+border-radius:10px;
+box-shadow:0 2px 8px #ccc;
+
+}
+
+
+button{
+
+background:#0b3d91;
+color:white;
+padding:10px;
+border:none;
+border-radius:5px;
+
+}
+
+
+</style>
+
+
 </head>
+
 
 <body>
 
-<h2>Review Product</h2>
+
+<div class="card">
 
 
-<!-- REVIEW FORM (ONLY SHOWN IF ELIGIBLE) -->
-{% if can_review %}
-
-<h3>Leave a Review</h3>
-
-<select id="rating">
-    <option value="5">★★★★★</option>
-    <option value="4">★★★★</option>
-    <option value="3">★★★</option>
-    <option value="2">★★</option>
-    <option value="1">★</option>
-</select>
-
-<br><br>
-
-<textarea
-id="comment"
-rows="5"
-cols="50"
-placeholder="Write your review">
-</textarea>
-
-<br><br>
-
-<button onclick="submitReview()">
-Submit Review
-</button>
-
-{% else %}
-
-<p style="color:red;">
-You can only review this product after it has been delivered.
-</p>
-
-{% endif %}
-
-<hr>
+<h2>
+Review {{product.name}}
+</h2>
 
 
-<h2>Previous Reviews</h2>
 
-<div id="reviews">
-Loading reviews...
-</div>
-
-<hr>
+<form method="POST"
+action="/review/add">
 
 
-<h2>Q & A</h2>
+<input type="hidden"
+name="product_id"
+value="{{product.id}}">
 
-<textarea
-id="question"
-placeholder="Ask about this product">
-</textarea>
+
+
+<label>
+Rating
+</label>
 
 <br>
 
-<button onclick="alert('Q&A feature coming soon')">
-Ask Question
+
+<select name="rating">
+
+<option value="5">
+⭐⭐⭐⭐⭐
+</option>
+
+
+<option value="4">
+⭐⭐⭐⭐
+</option>
+
+
+<option value="3">
+⭐⭐⭐
+</option>
+
+
+<option value="2">
+⭐⭐
+</option>
+
+
+<option value="1">
+⭐
+</option>
+
+</select>
+
+
+
+<br><br>
+
+
+<textarea
+name="comment"
+placeholder="Write review"
+required></textarea>
+
+
+<br><br>
+
+
+<button>
+Submit Review
 </button>
 
 
 
-<script>
-
-const product_id = {{ product_id }};
-
-function submitReview(){
-
-    fetch("/review/add", {
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            product_id:product_id,
-            rating:document.getElementById("rating").value,
-            comment:document.getElementById("comment").value
-        })
-    })
-
-    .then(res=>res.json())
-    .then(data=>{
-        alert(data.message || data.error);
-        loadReviews();
-    });
-
-}
+</form>
 
 
-function loadReviews(){
+</div>
 
-    fetch("/review/"+product_id)
-    .then(res=>res.json())
-    .then(data=>{
-
-        let html="";
-
-        if(data.reviews.length===0){
-            html="No reviews yet";
-        }
-
-        data.reviews.forEach(r=>{
-
-            html += `
-            <div>
-                <h3>${"⭐".repeat(r.rating)}</h3>
-                <p>${r.comment}</p>
-                <hr>
-            </div>
-            `;
-
-        });
-
-        document.getElementById("reviews").innerHTML=html;
-
-    });
-
-}
-
-loadReviews();
-
-</script>
 
 </body>
+
 </html>
